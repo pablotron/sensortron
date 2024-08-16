@@ -82,7 +82,7 @@
           title='Humidity in ${h(name)}.'
           aria-label='Humidity in ${h(name)}.'
         >
-          ${(data.h * 100).toFixed(2)}%
+          ${(data.h * 100).toFixed(1)}%
         </td>
       </tr>
     `,
