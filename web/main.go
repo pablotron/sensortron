@@ -95,8 +95,8 @@ func getPollRows() []PollRow {
   return rows
 }
 
-// /api/poll handler
-func doApiPoll(w http.ResponseWriter, r *http.Request) {
+// /api/home/poll handler
+func doApiHomePoll(w http.ResponseWriter, r *http.Request) {
   // get sorted list of latest readings
   rows := getPollRows()
 
@@ -115,8 +115,8 @@ func timestampSuffix() string {
   return fmt.Sprintf("%04d%02d%02d%02d%02d%02d", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second())
 }
 
-// /api/download/current handler
-func doApiDownloadCurrent(w http.ResponseWriter, r *http.Request) {
+// /api/home/download/current handler
+func doApiHomeDownloadCurrent(w http.ResponseWriter, r *http.Request) {
   // build content-disposition header value
   disposition := fmt.Sprintf("attachment; filename=\"sensortron-current-data-%s.csv\"", timestampSuffix())
 
@@ -143,8 +143,8 @@ func doApiDownloadCurrent(w http.ResponseWriter, r *http.Request) {
   }
 }
 
-// /api/forecast handler
-func doApiForecast(w http.ResponseWriter, r *http.Request) {
+// /api/home/forecast handler
+func doApiHomeForecast(w http.ResponseWriter, r *http.Request) {
   w.Header().Add("content-type", "application/json")
 
   // open mock forecast
@@ -164,8 +164,8 @@ func doApiForecast(w http.ResponseWriter, r *http.Request) {
   }
 }
 
-// /api/download/forecast handler
-func doApiDownloadForecast(w http.ResponseWriter, r *http.Request) {
+// /api/home/download/forecast handler
+func doApiHomeDownloadForecast(w http.ResponseWriter, r *http.Request) {
   // build content-disposition header value
   disposition := fmt.Sprintf("attachment; filename=\"sensortron-current-data-%s.csv\"", timestampSuffix())
 
@@ -218,8 +218,8 @@ func doHtmlFile(name string) func(http.ResponseWriter, *http.Request) {
   }
 }
 
-// mime types to compress
-var compressedTypes = []string {
+// response types to compress
+var compressedResponseTypes = []string {
   "application/json",
   "text/css",
   "test/csv",
@@ -228,23 +228,23 @@ var compressedTypes = []string {
 }
 
 func main() {
-  // get assets subdirectory
+  // get assets subdirectory from embedded resources
   assetsDir, err := io_fs.Sub(resFs, "res/assets")
   if err != nil {
     panic(err)
   }
 
-  // init router
+  // init router and middleware
   r := chi.NewRouter()
   r.Use(middleware.Logger)
-  r.Use(middleware.Compress(5, compressedTypes...))
+  r.Use(middleware.Compress(5, compressedResponseTypes...))
 
   // add routes
   r.Post("/api/read", doApiRead)
-  r.Post("/api/poll", doApiPoll)
-  r.Get("/api/download/current", doApiDownloadCurrent)
-  r.Post("/api/forecast", doApiForecast)
-  r.Get("/api/download/forecast", doApiDownloadForecast)
+  r.Post("/api/home/poll", doApiHomePoll)
+  r.Get("/api/home/download/current", doApiHomeDownloadCurrent)
+  r.Post("/api/home/forecast", doApiHomeForecast)
+  r.Get("/api/home/download/forecast", doApiHomeDownloadForecast)
   r.Get("/", doHtmlFile("home.html"))
   r.Get("/about/", doHtmlFile("about.html"))
   r.Handle("/assets/*", http.StripPrefix("/assets", http.FileServerFS(assetsDir)))

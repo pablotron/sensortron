@@ -108,7 +108,7 @@
   const current_el = document.getElementById('current'),
         forecast_el = document.getElementById('forecast');
 
-  const poll = () => fetch('/api/poll', { method: 'POST' }).then(
+  const poll = () => fetch('/api/home/poll', { method: 'POST' }).then(
     (r) => r.json()
   ).then((r) => {
     const unit = UNITS[document.querySelector('input.unit[type="radio"]:checked').value],
@@ -116,7 +116,7 @@
     current_el.innerHTML = T.current_table(unit, rows);
   });
 
-  const forecast = () => fetch('/api/forecast', { method: 'POST' }).then(
+  const forecast = () => fetch('/api/home/forecast', { method: 'POST' }).then(
     (r) => r.json()
   ).then((r) => {
     const rows = r.properties.periods.slice(0, 6)
