@@ -66,7 +66,15 @@
           title='Sensor location.'
           aria-label='Sensor location.'
         >
-          ${h(name)}
+          <a
+            href='#'
+            data-id='${id}'
+            data-name='${h(name)}'
+            title='Sensor location.'
+            aria-label='Sensor location.'
+          >
+            ${h(name)}
+          </a>
         </td>
 
         <td
@@ -127,6 +135,24 @@
   document.querySelectorAll('input.unit, label.unit').forEach((e) => {
     e.addEventListener('click', () => { setTimeout(poll, 10) })
   });
+
+  // bind to click events on names
+  current_el.addEventListener('click', (ev) => {
+    const data = ev.target.dataset;
+
+    console.log(ev);
+    ev.preventDefault();
+    const name = prompt('Enter new name for sensor "' + data.name + '":', data.name);
+    if (name !== null) {
+      fetch('/api/home/edit', {
+        method: 'POST',
+        body: JSON.stringify({
+          id: data.id,
+          name: name,
+        }),
+      }).then((r) => poll());
+    }
+  }, true);
 
   setInterval(poll, 10000); // 10s
   poll();
