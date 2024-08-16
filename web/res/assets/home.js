@@ -40,6 +40,7 @@
           </th>
 
           <th
+            style='text-align: right'
             title='Temperature (in ${unit.name}).'
             aria-label='Temperature (in ${unit.name}).'
           >
@@ -47,6 +48,7 @@
           </th>
 
           <th
+            style='text-align: right'
             title='Relative humidity (percent).'
             aria-label='Relative humidity (percent).'
           >
@@ -80,7 +82,7 @@
           title='Humidity in ${h(name)}.'
           aria-label='Humidity in ${h(name)}.'
         >
-          ${(data.h).toFixed(2)}%
+          ${(data.h * 100).toFixed(2)}%
         </td>
       </tr>
     `,
