@@ -199,4 +199,3 @@ func LatestObservations(ctx context.Context, stationId string) (http.Header, []b
 func Forecast(ctx context.Context, wfo string, x, y int) (http.Header, []byte, error) {
   return DefaultClient.Forecast(ctx, wfo, x, y)
 }
-
