@@ -145,21 +145,15 @@ func doApiHomeDownloadCurrent(w http.ResponseWriter, r *http.Request) {
   }
 }
 
+// latest cached forecast
+var cachedForecast = []byte("null")
+
 // /api/home/forecast handler
 func doApiHomeForecast(w http.ResponseWriter, r *http.Request) {
   w.Header().Add("content-type", "application/json")
 
-  // open mock forecast
-  f, err := resFs.Open("res/forecast.json")
-  if err != nil {
-    log.Print(fmt.Errorf("forecast.json: %w", err)) // log error
-    http.Error(w, "error", 500)
-    return
-  }
-  defer f.Close()
-
-  // send forecast
-  if _, err := io.Copy(w, f); err != nil {
+  // send cached forecast
+  if _, err := w.Write(cachedForecast); err != nil {
     log.Print(err) // log error
     http.Error(w, "error", 500)
     return
@@ -247,6 +241,7 @@ func fetchLatestObservations(ctx context.Context, stationId string) (nws.Observa
   return r, nil
 }
 
+// fetch outside temperature every 10 minutes
 func main() {
   // get assets subdirectory from embedded resources
   assetsDir, err := io_fs.Sub(resFs, "res/assets")
@@ -277,6 +272,30 @@ func main() {
         log.Printf("NWS data = %#v", data)
 
         latest["outside"] = data
+      }
+
+      // sleep until next fetch interval
+      time.Sleep(delay)
+    }
+  }()
+
+  // fetch current forecast every 4 hours
+  go func() {
+    ctx := context.Background()
+    delay, err := time.ParseDuration("4h")
+    if err != nil {
+      panic(err)
+    }
+
+    for {
+      // get current forecast
+      _, body, err := nws.Forecast(ctx, "LWX", 91, 70)
+      if err != nil {
+        log.Print(err)
+      } else {
+        // update cached forecast
+        cachedForecast = body
+        log.Printf("NWS forecast = %s", string(body))
       }
 
       // sleep until next fetch interval
