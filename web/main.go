@@ -29,6 +29,7 @@ var names = map[string]string {
   "e6614c311b4b4537": "living room",
   "e6614c311b267237": "dining room",
   "e6614c311b867937": "nadine's office",
+  "keylime": "bedroom",
 }
 
 // latest readings
