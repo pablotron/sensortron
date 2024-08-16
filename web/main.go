@@ -2,6 +2,7 @@
 package main
 
 import (
+  "context"
   "encoding/csv"
   "encoding/json"
   "embed"
@@ -10,6 +11,7 @@ import (
   io_fs "io/fs"
   "log"
   "net/http"
+  "sensortron/nws"
   "slices"
   "strings"
   "time"
@@ -227,12 +229,60 @@ var compressedResponseTypes = []string {
   "text/html",
 }
 
+// fetch latest observations from given station.
+func fetchLatestObservations(ctx context.Context, stationId string) (nws.ObservationsResponse, error) {
+  var r nws.ObservationsResponse
+
+  // get latest observations
+  _, body, err := nws.LatestObservations(ctx, "KDCA")
+  if err != nil {
+    return r, err
+  }
+
+  // parse response body
+  if err = json.Unmarshal(body, &r); err != nil {
+    return r, err
+  }
+
+  return r, nil
+}
+
 func main() {
   // get assets subdirectory from embedded resources
   assetsDir, err := io_fs.Sub(resFs, "res/assets")
   if err != nil {
     panic(err)
   }
+
+  go func() {
+    ctx := context.Background()
+    delay, err := time.ParseDuration("10m")
+    if err != nil {
+      panic(err)
+    }
+
+    for {
+      // get latest observations
+      observations, err := fetchLatestObservations(ctx, "KDCA")
+      if err != nil {
+        log.Print(err)
+      } else {
+        // convert from nws observation to SensorData
+        data := SensorData {
+          T: *observations.Properties.Temperature.Value,
+          H: *observations.Properties.RelativeHumidity.Value / 100.0,
+          P: *observations.Properties.BarometricPressure.Value,
+          E: observations.Properties.Timestamp,
+        }
+        log.Printf("NWS data = %#v", data)
+
+        latest["outside"] = data
+      }
+
+      // sleep until next fetch interval
+      time.Sleep(delay)
+    }
+  }()
 
   // init router and middleware
   r := chi.NewRouter()
