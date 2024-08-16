@@ -146,14 +146,14 @@ const HOME_HTML = `<!DOCTYPE html>
       /> Fahrenheit
     </label>
 
-    <script type='text/javascript' src='/assets/res/assets/home.js'></script>
+    <script type='text/javascript' src='/assets/home.js'></script>
   </body>
 </html>`
 
 
 // home page handler
 func doHome(w http.ResponseWriter, r *http.Request) {
-  w.Header().Add("content-type", "text/html")
+  w.Header().Add("content-type", "text/html; charset=utf-8")
 
   if _, err := w.Write([]byte(HOME_HTML)); err != nil {
     log.Print(err) // log error
@@ -164,11 +164,17 @@ func doHome(w http.ResponseWriter, r *http.Request) {
 func main() {
   r := chi.NewRouter()
 
+  // get assets subdirectory
+  assetsDir, err := io_fs.Sub(resFs, "res/assets")
+  if err != nil {
+    panic(err)
+  }
+
   r.Use(middleware.Logger)
   r.Post("/api/read", doApiRead)
   r.Post("/api/poll", doApiPoll)
   r.Get("/", doHome)
-  r.Handle("/assets/*", http.StripPrefix("/assets", http.FileServerFS(io_fs.FS(resFs))))
+  r.Handle("/assets/*", http.StripPrefix("/assets", http.FileServerFS(assetsDir)))
 
   log.Fatal(http.ListenAndServe(":1979", r))
 }
