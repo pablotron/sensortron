@@ -4,6 +4,8 @@ package main
 import (
   "encoding/json"
   "embed"
+  "fmt"
+  "io"
   io_fs "io/fs"
   "log"
   "net/http"
@@ -13,7 +15,7 @@ import (
   "github.com/go-chi/chi/v5/middleware"
 )
 
-//go:embed res/assets/*
+//go:embed res
 var resFs embed.FS
 
 // bme280 sensor readings
@@ -108,221 +110,27 @@ func doApiPoll(w http.ResponseWriter, r *http.Request) {
   }
 }
 
-// home page html
-const HOME_HTML = `<!DOCTYPE html>
-<html data-bs-theme='dark'>
-  <head>
-    <meta charset='utf-8'/>
-    <meta name='viewport' content='width=device-width, initial-scale=1'/>
+// return handler which sends named HTML file.
+func doHtmlFile(name string) func(http.ResponseWriter, *http.Request) {
+  // build full path
+  path := fmt.Sprintf("res/html/%s", name)
 
-    <title>SENSORTRON (beta)</title>
-    <link rel='stylesheet' type='text/css' href='/assets/bootstrap-5.3.3/css/bootstrap.min.css'/>
-  </head>
+  // return handler
+  return func(w http.ResponseWriter, r *http.Request) {
+    // open file
+    f, err := resFs.Open(path)
+    if err != nil {
+      log.Print(fmt.Errorf("%s: %w", name, err)) // log error
+      http.Error(w, "error", 400)
+      return
+    }
+    defer f.Close()
 
-  <body>
-    <nav class='navbar navbar-expand-lg bg-body-tertiary'>
-      <div class='container-fluid'>
-        <a
-          href='/'
-          class='navbar-brand'
-          title='SENSORTRON (beta)'
-          aria-label='SENSORTRON (beta)'
-        >SENSORTRON (beta)</a>
-
-        <button
-          type='button'
-          class='navbar-toggler'
-          data-bs-toggle='collapse'
-          data-bs-target='#navbar-content'
-          aria-controls='navbar-content'
-          aria-expanded='false'
-          title='Toggle navigation'
-          aria-label='Toggle navigation'
-        >
-          <span class='navbar-toggler-icon'></span>
-        </button>
-
-        <div id='navbar-content' class='collapse navbar-collapse'>
-          <ul class='navbar-nav me-auto mb-2 mb-lg-0'>
-            <li class='nav-item'>
-              <a
-                href='/'
-                class='nav-link active'
-                aria-current='page'
-                title='Home'
-                aria-label='Home'
-              >Home</a>
-            </li>
-
-            <li class='nav-item'>
-              <a
-                href='/about/'
-                class='nav-link'
-                title='About'
-                aria-label='About'
-              >About</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-
-    <div class='container'>
-      <br/>
-
-      <div class='card'>
-        <div class='card-header'>
-          <b>Current Measurements</b>
-        </div>
-
-        <table id='current-temps' class='table table-hover'>
-        </table>
-
-        <div class='card-footer'>
-          <div class='btn-group' role='group'>
-            <input
-              type='radio'
-              id='unit-celcius'
-              class='unit btn-check'
-              name='unit'
-              value='c'
-              autocomplete='off'
-              title='Celcius'
-              aria-label='Celcius'
-            />
-            <label
-              for='unit-celcius'
-              class='unit btn btn-sm btn-outline-primary'
-              title='Celcius'
-              aria-label='Celcius'
-            >
-              Celcius
-            </label>
-
-            <input
-              type='radio'
-              id='unit-fahrenheit'
-              class='unit btn-check'
-              name='unit'
-              value='f'
-              autocomplete='off'
-              title='Fahrenheit'
-              aria-label='Fahrenheit'
-              checked
-            />
-            <label
-              for='unit-fahrenheit'
-              class='unit btn btn-sm btn-outline-primary'
-              title='Fahrenheit'
-              aria-label='Fahrenheit'
-            >
-              Fahrenheit
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <script type='text/javascript' src='/assets/bootstrap-5.3.3/js/bootstrap.bundle.js'></script>
-    <script type='text/javascript' src='/assets/home.js'></script>
-  </body>
-</html>`
-
-// home page handler
-func doHome(w http.ResponseWriter, r *http.Request) {
-  w.Header().Add("content-type", "text/html; charset=utf-8")
-
-  if _, err := w.Write([]byte(HOME_HTML)); err != nil {
-    log.Print(err) // log error
-    return
-  }
-}
-
-// about page html
-const ABOUT_HTML = `<!DOCTYPE html>
-<html data-bs-theme='dark'>
-  <head>
-    <meta charset='utf-8'/>
-    <meta name='viewport' content='width=device-width, initial-scale=1'/>
-
-    <title>ABOOT SENSORTRON (beta)</title>
-    <link rel='stylesheet' type='text/css' href='/assets/bootstrap-5.3.3/css/bootstrap.min.css'/>
-  </head>
-
-  <body>
-    <nav class='navbar navbar-expand-lg bg-body-tertiary'>
-      <div class='container-fluid'>
-        <a
-          href='/'
-          class='navbar-brand'
-          title='SENSORTRON (beta)'
-          aria-label='SENSORTRON (beta)'
-        >SENSORTRON (beta)</a>
-
-        <button
-          type='button'
-          class='navbar-toggler'
-          data-bs-toggle='collapse'
-          data-bs-target='#navbar-content'
-          aria-controls='navbar-content'
-          aria-expanded='false'
-          title='Toggle navigation'
-          aria-label='Toggle navigation'
-        >
-          <span class='navbar-toggler-icon'></span>
-        </button>
-
-        <div id='navbar-content' class='collapse navbar-collapse'>
-          <ul class='navbar-nav me-auto mb-2 mb-lg-0'>
-            <li class='nav-item'>
-              <a
-                href='/'
-                class='nav-link'
-                title='Home'
-                aria-label='Home'
-              >Home</a>
-            </li>
-
-            <li class='nav-item'>
-              <a
-                href='/about/'
-                class='nav-link active'
-                aria-current='page'
-                title='About'
-                aria-label='About'
-              >About</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-
-    <div class='container'>
-      <br/>
-
-      <div class='card'>
-        <div class='card-header'>
-          <b>ABOOT SENSORTRON (beta)</b>
-        </div>
-
-        <div class='card-body'>
-          synergy
-        </dev>
-      </div>
-    </div>
-
-    <script type='text/javascript' src='/assets/bootstrap-5.3.3/js/bootstrap.bundle.js'></script>
-    <script type='text/javascript' src='/assets/about.js'></script>
-  </body>
-</html>`
-
-// about page handler
-func doAbout(w http.ResponseWriter, r *http.Request) {
-  w.Header().Add("content-type", "text/html; charset=utf-8")
-
-  if _, err := w.Write([]byte(ABOUT_HTML)); err != nil {
-    log.Print(err) // log error
-    return
+    if _, err := io.Copy(w, f); err != nil {
+      log.Print(fmt.Errorf("%s: %w", name, err)) // log error
+      http.Error(w, "error", 400)
+      return
+    }
   }
 }
 
@@ -340,8 +148,8 @@ func main() {
   // add routes
   r.Post("/api/read", doApiRead)
   r.Post("/api/poll", doApiPoll)
-  r.Get("/", doHome)
-  r.Get("/about/", doAbout)
+  r.Get("/", doHtmlFile("home.html"))
+  r.Get("/about/", doHtmlFile("about.html"))
   r.Handle("/assets/*", http.StripPrefix("/assets", http.FileServerFS(assetsDir)))
 
   // serve
