@@ -130,6 +130,14 @@ func doHtmlFile(name string) func(http.ResponseWriter, *http.Request) {
   }
 }
 
+// mime types to compress
+var compressedTypes = []string {
+  "text/html",
+  "text/css",
+  "text/javascript",
+  "application/json",
+}
+
 func main() {
   // get assets subdirectory
   assetsDir, err := io_fs.Sub(resFs, "res/assets")
@@ -140,6 +148,7 @@ func main() {
   // init router
   r := chi.NewRouter()
   r.Use(middleware.Logger)
+  r.Use(middleware.Compress(5, compressedTypes...))
 
   // add routes
   r.Post("/api/read", doApiRead)
