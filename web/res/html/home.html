@@ -67,64 +67,89 @@
           <b>Current Data</b>
         </div>
 
-        <table id='current-data' class='table table-hover'>
+        <table id='current' class='table table-hover'>
         </table>
 
         <div class='card-footer'>
           <div class='btn-toolbar justify-content-between'>
+            <div class='btn-group' role='group'>
+              <a
+                href='/api/download/current'
+                class='btn btn-sm btn-primary'
+                title='Download current data as a CSV file.'
+                aria-label='Download current data as a CSV file.'
+              >
+                Download
+              </a>
+            </div><!-- btn-group -->
+
+            <div class='btn-group' role='group'>
+              <input
+                type='radio'
+                id='unit-celcius'
+                class='unit btn-check'
+                name='unit'
+                value='c'
+                autocomplete='off'
+                title='Celcius'
+                aria-label='Celcius'
+              />
+              <label
+                for='unit-celcius'
+                class='unit btn btn-sm btn-outline-primary'
+                title='Celcius'
+                aria-label='Celcius'
+              >
+                Celcius
+              </label>
+
+              <input
+                type='radio'
+                id='unit-fahrenheit'
+                class='unit btn-check'
+                name='unit'
+                value='f'
+                autocomplete='off'
+                title='Fahrenheit'
+                aria-label='Fahrenheit'
+                checked
+              />
+              <label
+                for='unit-fahrenheit'
+                class='unit btn btn-sm btn-outline-primary'
+                title='Fahrenheit'
+                aria-label='Fahrenheit'
+              >
+                Fahrenheit
+              </label>
+            </div><!-- btn-group -->
+          </div><!-- btn-toolbar -->
+        </div><!-- card-footer -->
+      </div><!-- card -->
+
+      <br/>
+
+      <div class='card'>
+        <div class='card-header'>
+          <b>Forecast</b>
+        </div>
+
+        <ul id='forecast' class='list-group'>
+        </ul>
+
+        <div class='card-footer'>
           <div class='btn-group' role='group'>
             <a
-              href='/api/download-current'
+              href='/api/download/forecast'
               class='btn btn-sm btn-primary'
-              title='Download current data as a CSV file.'
-              aria-label='Download current data as a CSV file.'
+              title='Download forecast as a CSV file.'
+              aria-label='Download forecast as a CSV file.'
             >
               Download
             </a>
-          </div>
-
-          <div class='btn-group' role='group'>
-            <input
-              type='radio'
-              id='unit-celcius'
-              class='unit btn-check'
-              name='unit'
-              value='c'
-              autocomplete='off'
-              title='Celcius'
-              aria-label='Celcius'
-            />
-            <label
-              for='unit-celcius'
-              class='unit btn btn-sm btn-outline-primary'
-              title='Celcius'
-              aria-label='Celcius'
-            >
-              Celcius
-            </label>
-
-            <input
-              type='radio'
-              id='unit-fahrenheit'
-              class='unit btn-check'
-              name='unit'
-              value='f'
-              autocomplete='off'
-              title='Fahrenheit'
-              aria-label='Fahrenheit'
-              checked
-            />
-            <label
-              for='unit-fahrenheit'
-              class='unit btn btn-sm btn-outline-primary'
-              title='Fahrenheit'
-              aria-label='Fahrenheit'
-            >
-              Fahrenheit
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
+          </div><!-- btn-group -->
+        </div><!-- card-footer -->
+      </div><!-- card -->
+    </div><!-- container -->
   </body>
 </html>

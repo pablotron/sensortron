@@ -115,10 +115,61 @@ func timestampSuffix() string {
   return fmt.Sprintf("%04d%02d%02d%02d%02d%02d", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second())
 }
 
-// /api/download-current handler
+// /api/download/current handler
 func doApiDownloadCurrent(w http.ResponseWriter, r *http.Request) {
   // build content-disposition header value
   disposition := fmt.Sprintf("attachment; filename=\"sensortron-current-data-%s.csv\"", timestampSuffix())
+
+  // build csv rows
+  rows := make([][]string, 0, len(latest) + 1)
+  rows = append(rows, []string { "Location", "Temperature (F)", "Humidity (%)" })
+  for _, row := range(getPollRows()) {
+    rows = append(rows, []string {
+      row.Name,
+      fmt.Sprintf("%2.2f", row.Data.T * 9.0/5.0 + 32.0),
+      fmt.Sprintf("%2.1f", row.Data.H * 100.0),
+    })
+  }
+
+  // send headers
+  w.Header().Add("content-type", "text/csv; charset=utf-8")
+  w.Header().Add("content-disposition", disposition)
+
+  // send rows
+  if err := csv.NewWriter(w).WriteAll(rows); err != nil {
+    log.Print(err) // log error
+    http.Error(w, "error", 500)
+    return
+  }
+}
+
+// /api/forecast handler
+func doApiForecast(w http.ResponseWriter, r *http.Request) {
+  w.Header().Add("content-type", "application/json")
+
+  // open mock forecast
+  f, err := resFs.Open("res/forecast.json")
+  if err != nil {
+    log.Print(fmt.Errorf("forecast.json: %w", err)) // log error
+    http.Error(w, "error", 500)
+    return
+  }
+  defer f.Close()
+
+  // send forecast
+  if _, err := io.Copy(w, f); err != nil {
+    log.Print(err) // log error
+    http.Error(w, "error", 500)
+    return
+  }
+}
+
+// /api/download/forecast handler
+func doApiDownloadForecast(w http.ResponseWriter, r *http.Request) {
+  // build content-disposition header value
+  disposition := fmt.Sprintf("attachment; filename=\"sensortron-current-data-%s.csv\"", timestampSuffix())
+
+  // TODO: replace this with real forecast download
 
   // build csv rows
   rows := make([][]string, 0, len(latest) + 1)
@@ -191,7 +242,9 @@ func main() {
   // add routes
   r.Post("/api/read", doApiRead)
   r.Post("/api/poll", doApiPoll)
-  r.Get("/api/download-current", doApiDownloadCurrent)
+  r.Get("/api/download/current", doApiDownloadCurrent)
+  r.Post("/api/forecast", doApiForecast)
+  r.Get("/api/download/forecast", doApiDownloadForecast)
   r.Get("/", doHtmlFile("home.html"))
   r.Get("/about/", doHtmlFile("about.html"))
   r.Handle("/assets/*", http.StripPrefix("/assets", http.FileServerFS(assetsDir)))

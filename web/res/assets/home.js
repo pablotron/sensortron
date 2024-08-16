@@ -29,7 +29,7 @@
 
   // templates
   const T = {
-    table: (unit, rows) => `
+    current_table: (unit, rows) => `
       <thead>
         <tr>
           <th
@@ -60,7 +60,7 @@
       <tbody>${rows}</tbody>
     `,
 
-    row: (unit, {id, name, data}) => `
+    current_row: (unit, {id, name, data}) => `
       <tr id='${id}'>
         <td
           title='Sensor location.'
@@ -86,17 +86,41 @@
         </td>
       </tr>
     `,
+
+    forecast_row: ({name, icon, shortForecast, detailedForecast, temperature, windSpeed, windDirection}) => `
+      <li class='list-group-item'>
+        <img
+          src='${icon}'
+          class='rounded float-start me-2'
+          title='$(h(name)): ${h(shortForecast)}'
+          aria-label='$(h(name)): ${h(shortForecast)}'
+          alt='$(h(name)): ${h(shortForecast)}'
+        />
+
+        <h5>${h(name)}</h5>
+        Temperature: <b>${temperature} F</b>, Wind: ${windSpeed} ${windDirection}<br/>
+        ${h(shortForecast)}
+      </li>
+    `,
   };
 
-  // cache table wrapper
-  const div = document.getElementById('current-data');
+  // cache current data wrapper and forecast wrapper
+  const current_el = document.getElementById('current'),
+        forecast_el = document.getElementById('forecast');
 
   const poll = () => fetch('/api/poll', { method: 'POST' }).then(
     (r) => r.json()
   ).then((r) => {
-    // get unit
-    const unit = UNITS[document.querySelector('input.unit[type="radio"]:checked').value];
-    div.innerHTML = T.table(unit, r.map((row) => T.row(unit, row)).join(''));
+    const unit = UNITS[document.querySelector('input.unit[type="radio"]:checked').value],
+          rows = r.map((row) => T.current_row(unit, row)).join('');
+    current_el.innerHTML = T.current_table(unit, rows);
+  });
+
+  const forecast = () => fetch('/api/forecast', { method: 'POST' }).then(
+    (r) => r.json()
+  ).then((r) => {
+    const rows = r.properties.periods.slice(0, 6)
+    forecast_el.innerHTML = rows.map((row) => T.forecast_row(row)).join('');
   });
 
   // bind click events
@@ -104,6 +128,9 @@
     e.addEventListener('click', () => { setTimeout(poll, 10) })
   });
 
-  setInterval(poll, 10000);
+  setInterval(poll, 10000); // 10s
   poll();
+
+  setInterval(forecast, 30 * 60000); // 30m
+  forecast();
 })();
