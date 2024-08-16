@@ -1,6 +1,15 @@
 (() => {
   'use strict';
 
+  // html escape (replaceall explicit)
+  const h = (v) => {
+    return v.replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll("'", '&apos;')
+      .replaceAll('"', '&quot;');
+  };
+
   // temperature units
   const UNITS = {
     f: {
@@ -21,36 +30,40 @@
   // templates
   const T = {
     table: (unit, rows) => `
-      <table>
-        <thead>
-          <tr>
-            <th title='room' aria-label='room'>
-              room
-            </th>
+      <thead>
+        <tr>
+          <th
+            title='Sensor location.'
+            aria-label='Sensor location.'
+          >
+            Location
+          </th>
 
-            <th
-              title='temperature (${unit.abbr})'
-              aria-label='temperature (${unit.abbr})'
-            >
-              temp (&deg;${unit.abbr})
-            </th>
-          </tr>
-        </thead>
+          <th
+            title='Temperature, measured in degrees ${unit.name}.'
+            aria-label='Temperature, measured in degrees ${unit.name}.'
+          >
+            Temperature (&deg;${unit.abbr})
+          </th>
+        </tr>
+      </thead>
 
-        <tbody>${rows}</tbody>
-      </table>
+      <tbody>${rows}</tbody>
     `,
 
     row: (unit, {id, name, temp}) => `
       <tr id='${id}'>
-        <td title='room' aria-label='room'>
-          ${name}
+        <td
+          title='Sensor location.'
+          aria-label='Sensor location.'
+        >
+          ${h(name)}
         </td>
 
         <td
           style='text-align: right'
-          title='temperature (${unit.abbr})'
-          aria-label='temperature (${unit.abbr})'
+          title='Temperature of ${h(name)} (${unit.abbr}).'
+          aria-label='Temperature of ${h(name)} (${unit.abbr}).'
         >
           ${(temp * unit.m + unit.b).toFixed(2)}
         </td>
