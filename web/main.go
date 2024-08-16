@@ -18,8 +18,8 @@ import (
 //go:embed res
 var resFs embed.FS
 
-// bme280 sensor readings
-type SensorReadings struct {
+// bme280 sensor data
+type SensorData struct {
   T float32 `json:"t"` // temperature, in degrees celcius
   H float32 `json:"h"` // humidity, percentage
   P float32 `json:"p"` // pressure, in pascals
@@ -34,14 +34,14 @@ var names = map[string]string {
   "keylime": "bedroom",
 }
 
-// latest readings
-var latest = make(map[string]SensorReadings)
+// latest values
+var latest = make(map[string]SensorData)
 
 // /api/read handler
 func doApiRead(w http.ResponseWriter, r *http.Request) {
   // decode sensor readings from request body
-  var sr SensorReadings
-  if err := json.NewDecoder(r.Body).Decode(&sr); err != nil {
+  var data SensorData
+  if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
     log.Print(err) // log error
     http.Error(w, "error", 500)
     return
@@ -51,9 +51,9 @@ func doApiRead(w http.ResponseWriter, r *http.Request) {
   id := r.Header.Get("x-unique-id")
   mac := r.Header.Get("x-pseudo-mac-sha256")
 
-  // save latest reading, log result
-  latest[id] = sr
-  log.Printf("id = %s, mac = %s, data = %#v", id, mac, sr)
+  // save latest values, log result
+  latest[id] = data
+  log.Printf("id = %s, mac = %s, data = %#v", id, mac, data)
 
   // respond with success
   w.Header().Add("content-type", "application/json")
@@ -66,14 +66,14 @@ func doApiRead(w http.ResponseWriter, r *http.Request) {
 type PollRow struct {
   Id string `json:"id"` // sensor ID
   Name string `json:"name"` // room name
-  Temp float32 `json:"temp"` // temperature
+  Data SensorData `json:"data"` // sensor data
 }
 
 // Get a slice of poll rows sorted by room name.
 func getPollRows() []PollRow {
   // build list of sensor readings
   rows := make([]PollRow, 0, len(latest))
-  for id, sensorRow := range(latest) {
+  for id, sr := range(latest) {
     // get room name
     name := names[id]
     if name == "" {
@@ -81,11 +81,7 @@ func getPollRows() []PollRow {
     }
 
     // append to rows
-    rows = append(rows, PollRow {
-      Id: id,
-      Name: name,
-      Temp: sensorRow.T,
-    })
+    rows = append(rows, PollRow { id, name, sr })
   }
 
   // sort rows by name

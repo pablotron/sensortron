@@ -40,10 +40,17 @@
           </th>
 
           <th
-            title='Temperature, measured in degrees ${unit.name}.'
-            aria-label='Temperature, measured in degrees ${unit.name}.'
+            title='Temperature (in ${unit.name}).'
+            aria-label='Temperature (in ${unit.name}).'
           >
             Temperature (&deg;${unit.abbr})
+          </th>
+
+          <th
+            title='Relative humidity (percent).'
+            aria-label='Relative humidity (percent).'
+          >
+            Humidity (%)
           </th>
         </tr>
       </thead>
@@ -51,7 +58,7 @@
       <tbody>${rows}</tbody>
     `,
 
-    row: (unit, {id, name, temp}) => `
+    row: (unit, {id, name, data}) => `
       <tr id='${id}'>
         <td
           title='Sensor location.'
@@ -62,17 +69,25 @@
 
         <td
           style='text-align: right'
-          title='Temperature of ${h(name)} (${unit.abbr}).'
-          aria-label='Temperature of ${h(name)} (${unit.abbr}).'
+          title='${h(name)} temperature (${unit.abbr}).'
+          aria-label='${h(name)} temperature (${unit.abbr}).'
         >
-          ${(temp * unit.m + unit.b).toFixed(2)}
+          ${(data.t * unit.m + unit.b).toFixed(2)}
+        </td>
+
+        <td
+          style='text-align: right'
+          title='Humidity in ${h(name)}.'
+          aria-label='Humidity in ${h(name)}.'
+        >
+          ${(data.h).toFixed(2)}%
         </td>
       </tr>
     `,
   };
 
   // cache table wrapper
-  const div = document.getElementById('current-temps');
+  const div = document.getElementById('current-data');
 
   const poll = () => fetch('/api/poll', { method: 'POST' }).then(
     (r) => r.json()
