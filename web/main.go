@@ -117,6 +117,9 @@ func timestampSuffix() string {
 
 // /api/download-current handler
 func doApiDownloadCurrent(w http.ResponseWriter, r *http.Request) {
+  // build content-disposition header value
+  disposition := fmt.Sprintf("attachment; filename=\"sensortron-current-data-%s.csv\"", timestampSuffix())
+
   // build csv rows
   rows := make([][]string, 0, len(latest) + 1)
   rows = append(rows, []string { "Location", "Temperature (F)", "Humidity (%)" })
@@ -130,7 +133,7 @@ func doApiDownloadCurrent(w http.ResponseWriter, r *http.Request) {
 
   // send headers
   w.Header().Add("content-type", "text/csv; charset=utf-8")
-  w.Header().Add("content-disposition", fmt.Sprintf("attachment; filename=\"data-%s.csv\"", timestampSuffix()))
+  w.Header().Add("content-disposition", disposition)
 
   // send rows
   if err := csv.NewWriter(w).WriteAll(rows); err != nil {
