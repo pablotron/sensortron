@@ -2,6 +2,7 @@
 package main
 
 import (
+  "encoding/csv"
   "encoding/json"
   "embed"
   "fmt"
@@ -11,6 +12,8 @@ import (
   "net/http"
   "slices"
   "strings"
+  "time"
+
   "github.com/go-chi/chi/v5"
   "github.com/go-chi/chi/v5/middleware"
 )
@@ -106,6 +109,37 @@ func doApiPoll(w http.ResponseWriter, r *http.Request) {
   }
 }
 
+// Get filename timestamp suffix in YYYYMMDDHHMMSS format.
+func timestampSuffix() string {
+  now := time.Now()
+  return fmt.Sprintf("%04d%02d%02d%02d%02d%02d", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second())
+}
+
+// /api/download-current handler
+func doApiDownloadCurrent(w http.ResponseWriter, r *http.Request) {
+  // build csv rows
+  rows := make([][]string, 0, len(latest) + 1)
+  rows = append(rows, []string { "Location", "Temperature (F)", "Humidity (%)" })
+  for _, row := range(getPollRows()) {
+    rows = append(rows, []string {
+      row.Name,
+      fmt.Sprintf("%2.2f", row.Data.T * 9.0/5.0 + 32.0),
+      fmt.Sprintf("%2.1f", row.Data.H * 100.0),
+    })
+  }
+
+  // send headers
+  w.Header().Add("content-type", "text/csv; charset=utf-8")
+  w.Header().Add("content-disposition", fmt.Sprintf("attachment; filename=\"data-%s.csv\"", timestampSuffix()))
+
+  // send rows
+  if err := csv.NewWriter(w).WriteAll(rows); err != nil {
+    log.Print(err) // log error
+    http.Error(w, "error", 500)
+    return
+  }
+}
+
 // return handler which sends named HTML file.
 func doHtmlFile(name string) func(http.ResponseWriter, *http.Request) {
   // build full path
@@ -132,10 +166,11 @@ func doHtmlFile(name string) func(http.ResponseWriter, *http.Request) {
 
 // mime types to compress
 var compressedTypes = []string {
-  "text/html",
-  "text/css",
-  "text/javascript",
   "application/json",
+  "text/css",
+  "test/csv",
+  "text/javascript",
+  "text/html",
 }
 
 func main() {
@@ -153,6 +188,7 @@ func main() {
   // add routes
   r.Post("/api/read", doApiRead)
   r.Post("/api/poll", doApiPoll)
+  r.Get("/api/download-current", doApiDownloadCurrent)
   r.Get("/", doHtmlFile("home.html"))
   r.Get("/about/", doHtmlFile("about.html"))
   r.Handle("/assets/*", http.StripPrefix("/assets", http.FileServerFS(assetsDir)))
