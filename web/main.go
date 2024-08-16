@@ -111,6 +111,29 @@ func doApiHomePoll(w http.ResponseWriter, r *http.Request) {
   }
 }
 
+// /api/home/edit handler
+func doApiHomeEdit(w http.ResponseWriter, r *http.Request) {
+  // parse args
+  var args map[string]string
+  if err := json.NewDecoder(r.Body).Decode(&args); err != nil {
+    log.Print(err) // log error
+    http.Error(w, "error", 500)
+    return
+  }
+
+  if len(args["name"]) > 0 {
+    // save name
+    names[args["id"]] = args["name"]
+  }
+
+  // respond with success
+  w.Header().Add("content-type", "application/json")
+  if _, err := w.Write([]byte("null")); err != nil {
+    log.Print(err) // log error
+    return
+  }
+}
+
 // Get filename timestamp suffix in YYYYMMDDHHMMSS format.
 func timestampSuffix() string {
   now := time.Now()
@@ -311,6 +334,7 @@ func main() {
   // add routes
   r.Post("/api/read", doApiRead)
   r.Post("/api/home/poll", doApiHomePoll)
+  r.Post("/api/home/edit", doApiHomeEdit)
   r.Get("/api/home/download/current", doApiHomeDownloadCurrent)
   r.Post("/api/home/forecast", doApiHomeForecast)
   r.Get("/api/home/download/forecast", doApiHomeDownloadForecast)
