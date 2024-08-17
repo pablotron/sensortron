@@ -59,10 +59,8 @@
       </div>
     </nav>
 
-    <div class='container'>
-      <br/>
-
-      <div class='card'>
+    <div class='container mb-4'>
+      <div class='card mt-4'>
         <div class='card-header'>
           <b>Current Data</b>
         </div>
@@ -127,9 +125,7 @@
         </div><!-- card-footer -->
       </div><!-- card -->
 
-      <br/>
-
-      <div class='card'>
+      <div class='card mt-4'>
         <div class='card-header'>
           <b>Forecast</b>
         </div>
@@ -138,16 +134,29 @@
         </ul>
 
         <div class='card-footer'>
-          <div class='btn-group' role='group'>
-            <a
-              href='/api/home/download/forecast'
-              class='btn btn-sm btn-primary'
-              title='Download forecast as a CSV file.'
-              aria-label='Download forecast as a CSV file.'
-            >
-              Download
-            </a>
-          </div><!-- btn-group -->
+          <div class='btn-toolbar justify-content-between'>
+            <div class='btn-group' role='group'>
+              <a
+                href='/api/home/download/forecast'
+                class='btn btn-sm btn-primary'
+                title='Download forecast as a CSV file.'
+                aria-label='Download forecast as a CSV file.'
+              >
+                Download
+              </a>
+            </div><!-- btn-group -->
+
+            <div class='btn-group' role='group'>
+              <a
+                href='/forecasts/'
+                class='btn btn-sm btn-primary'
+                title='Show more forecasts.'
+                aria-label='Show more forecasts.'
+              >
+                Show More
+              </a>
+            </div><!-- btn-group -->
+          </div><!-- btn-toolbar -->
         </div><!-- card-footer -->
       </div><!-- card -->
     </div><!-- container -->
