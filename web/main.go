@@ -209,11 +209,11 @@ func doApiHomeDownloadForecast(w http.ResponseWriter, r *http.Request) {
   // build csv rows
   rows := make([][]string, 0, len(latest) + 1)
   rows = append(rows, homeForecastCsvCols)
-  for _, row := range(forecast.Periods) {
+  for _, row := range(forecast.Properties.Periods) {
     rows = append(rows, []string {
       row.Name,
-      fmt.Sprintf("%2.2f", row.Temperature * 9.0/5.0 + 32.0),
-      fmt.Sprintf("%d", row.WindSpeed),
+      fmt.Sprintf("%d", row.Temperature),
+      row.WindSpeed,
       row.WindDirection,
       row.ShortForecast,
       row.DetailedForecast,
