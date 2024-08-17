@@ -127,7 +127,8 @@
   const forecast = () => fetch('/api/home/forecast', { method: 'POST' }).then(
     (r) => r.json()
   ).then((r) => {
-    const rows = r.properties.periods.slice(0, 6)
+    forecast_el.dataset.forecast = JSON.stringify(r);
+    const rows = r.properties.periods.slice(0, 4);
     forecast_el.innerHTML = rows.map((row) => T.forecast_row(row)).join('');
   });
 
@@ -138,19 +139,21 @@
 
   // bind to click events on names
   current_el.addEventListener('click', (ev) => {
-    const data = ev.target.dataset;
+    if (ev.target.tagName === 'A') {
+      const data = ev.target.dataset;
 
-    console.log(ev);
-    ev.preventDefault();
-    const name = prompt('Enter new name for sensor "' + data.name + '":', data.name);
-    if (name !== null) {
-      fetch('/api/home/edit', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: data.id,
-          name: name,
-        }),
-      }).then((r) => poll());
+      console.log(ev);
+      ev.preventDefault();
+      const name = prompt('Enter new name for sensor "' + data.name + '":', data.name);
+      if (name !== null) {
+        fetch('/api/home/edit', {
+          method: 'POST',
+          body: JSON.stringify({
+            id: data.id,
+            name: name,
+          }),
+        }).then((r) => poll());
+      }
     }
   }, true);
 
