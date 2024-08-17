@@ -176,9 +176,9 @@ type ForecastResponse struct {
     UpdateTime string `json:"updateTime"` // update time
     ValidTimes string `json:"validTimes"` // valid times
     Elevation Property `json:"elevation"` // elevation
-  } `json:"properties"` // properties
 
-  Periods []Period `json:"periods"` // periods
+    Periods []Period `json:"periods"` // periods
+  } `json:"properties"` // properties
 }
 
 // Get forecast for given forecast office and grid coordinates.
