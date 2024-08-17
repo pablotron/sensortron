@@ -340,6 +340,7 @@ func main() {
   r.Get("/api/home/download/forecast", doApiHomeDownloadForecast)
   r.Get("/", doHtmlFile("home.html"))
   r.Get("/about/", doHtmlFile("about.html"))
+  r.Get("/forecasts/", doHtmlFile("forecasts.html"))
   r.Handle("/assets/*", http.StripPrefix("/assets", http.FileServerFS(assetsDir)))
 
   // serve
