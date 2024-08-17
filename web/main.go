@@ -183,21 +183,40 @@ func doApiHomeForecast(w http.ResponseWriter, r *http.Request) {
   }
 }
 
+// home forecast csv column headers
+var homeForecastCsvCols = []string {
+  "Period",
+  "Temperature (F)",
+  "Wind Speed",
+  "Wind Direction",
+  "Short Forecast",
+  "Detailed Forecast",
+}
+
 // /api/home/download/forecast handler
 func doApiHomeDownloadForecast(w http.ResponseWriter, r *http.Request) {
   // build content-disposition header value
-  disposition := fmt.Sprintf("attachment; filename=\"sensortron-current-data-%s.csv\"", timestampSuffix())
+  disposition := fmt.Sprintf("attachment; filename=\"sensortron-forecast-%s.csv\"", timestampSuffix())
 
-  // TODO: replace this with real forecast download
+  // parse cached forecast
+  var forecast nws.ForecastResponse
+  if err := json.Unmarshal(cachedForecast, &forecast); err != nil {
+    log.Print(err) // log error
+    http.Error(w, "error", 500)
+    return
+  }
 
   // build csv rows
   rows := make([][]string, 0, len(latest) + 1)
-  rows = append(rows, []string { "Location", "Temperature (F)", "Humidity (%)" })
-  for _, row := range(getPollRows()) {
+  rows = append(rows, homeForecastCsvCols)
+  for _, row := range(forecast.Periods) {
     rows = append(rows, []string {
       row.Name,
-      fmt.Sprintf("%2.2f", row.Data.T * 9.0/5.0 + 32.0),
-      fmt.Sprintf("%2.1f", row.Data.H * 100.0),
+      fmt.Sprintf("%2.2f", row.Temperature * 9.0/5.0 + 32.0),
+      fmt.Sprintf("%d", row.WindSpeed),
+      row.WindDirection,
+      row.ShortForecast,
+      row.DetailedForecast,
     })
   }
 
