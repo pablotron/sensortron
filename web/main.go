@@ -265,25 +265,31 @@ var compressedResponseTypes = []string {
   "text/html",
 }
 
-// fetch latest observations from given station.
-func fetchLatestObservations(ctx context.Context, stationId string) (nws.ObservationsResponse, error) {
-  var r nws.ObservationsResponse
+// fetch latest NWS observations from given station and convert them to
+// sensor data
+func fetchLatestObservations(ctx context.Context, stationId string) (SensorData, error) {
+  var observations nws.ObservationsResponse
 
   // get latest observations
   _, body, err := nws.LatestObservations(ctx, "KDCA")
   if err != nil {
-    return r, err
+    return SensorData{}, err
   }
 
-  // parse response body
-  if err = json.Unmarshal(body, &r); err != nil {
-    return r, err
+  // parse observations body
+  if err = json.Unmarshal(body, &observations); err != nil {
+    return SensorData{}, err
   }
 
-  return r, nil
+  // build and return sensor data
+  return SensorData {
+    T: *observations.Properties.Temperature.Value,
+    H: *observations.Properties.RelativeHumidity.Value / 100.0,
+    P: *observations.Properties.BarometricPressure.Value,
+    E: observations.Properties.Timestamp,
+  }, nil
 }
 
-// fetch outside temperature every 10 minutes
 func main() {
   // get assets subdirectory from embedded resources
   assetsDir, err := io_fs.Sub(resFs, "res/assets")
@@ -291,6 +297,7 @@ func main() {
     panic(err)
   }
 
+  // fetch outside temperature every 10 minutes
   go func() {
     ctx := context.Background()
     delay, err := time.ParseDuration("10m")
@@ -299,20 +306,11 @@ func main() {
     }
 
     for {
-      // get latest observations
-      observations, err := fetchLatestObservations(ctx, "KDCA")
-      if err != nil {
+      // get latest observations as sensordata
+      if data, err := fetchLatestObservations(ctx, "KDCA"); err != nil {
         log.Print(err)
       } else {
-        // convert from nws observation to SensorData
-        data := SensorData {
-          T: *observations.Properties.Temperature.Value,
-          H: *observations.Properties.RelativeHumidity.Value / 100.0,
-          P: *observations.Properties.BarometricPressure.Value,
-          E: observations.Properties.Timestamp,
-        }
         log.Printf("NWS data = %#v", data)
-
         latest["outside"] = data
       }
 
