@@ -116,7 +116,7 @@
   const current_el = document.getElementById('current'),
         forecast_el = document.getElementById('forecast');
 
-  const poll = () => fetch('/api/home/poll', { method: 'POST' }).then(
+  const poll = () => fetch('/api/home/current/poll', { method: 'POST' }).then(
     (r) => r.json()
   ).then((r) => {
     const unit = UNITS[document.querySelector('input.unit[type="radio"]:checked').value],
@@ -124,7 +124,7 @@
     current_el.innerHTML = T.current_table(unit, rows);
   });
 
-  const forecast = () => fetch('/api/home/forecast', { method: 'POST' }).then(
+  const forecast = () => fetch('/api/home/forecast/poll', { method: 'POST' }).then(
     (r) => r.json()
   ).then((r) => {
     forecast_el.dataset.forecast = JSON.stringify(r);
@@ -146,7 +146,7 @@
       ev.preventDefault();
       const name = prompt('Enter new name for sensor "' + data.name + '":', data.name);
       if (name !== null) {
-        fetch('/api/home/edit', {
+        fetch('/api/home/current/edit', {
           method: 'POST',
           body: JSON.stringify({
             id: data.id,
@@ -157,9 +157,11 @@
     }
   }, true);
 
+  // poll for current data
   setInterval(poll, 10000); // 10s
   poll();
 
+  // poll for forecast
   setInterval(forecast, 30 * 60000); // 30m
   forecast();
 })();
