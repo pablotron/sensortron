@@ -97,8 +97,8 @@ func getPollRows() []PollRow {
   return rows
 }
 
-// /api/home/poll handler
-func doApiHomePoll(w http.ResponseWriter, r *http.Request) {
+// /api/home/current/poll handler
+func doApiHomeCurrentPoll(w http.ResponseWriter, r *http.Request) {
   // get sorted list of latest readings
   rows := getPollRows()
 
@@ -111,8 +111,8 @@ func doApiHomePoll(w http.ResponseWriter, r *http.Request) {
   }
 }
 
-// /api/home/edit handler
-func doApiHomeEdit(w http.ResponseWriter, r *http.Request) {
+// /api/home/current/edit handler
+func doApiHomeCurrentEdit(w http.ResponseWriter, r *http.Request) {
   // parse args
   var args map[string]string
   if err := json.NewDecoder(r.Body).Decode(&args); err != nil {
@@ -140,8 +140,8 @@ func timestampSuffix() string {
   return fmt.Sprintf("%04d%02d%02d%02d%02d%02d", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second())
 }
 
-// /api/home/download/current handler
-func doApiHomeDownloadCurrent(w http.ResponseWriter, r *http.Request) {
+// /api/home/current/download handler
+func doApiHomeCurrentDownload(w http.ResponseWriter, r *http.Request) {
   // build content-disposition header value
   disposition := fmt.Sprintf("attachment; filename=\"sensortron-current-data-%s.csv\"", timestampSuffix())
 
@@ -171,8 +171,8 @@ func doApiHomeDownloadCurrent(w http.ResponseWriter, r *http.Request) {
 // latest cached forecast
 var cachedForecast = []byte("null")
 
-// /api/home/forecast handler
-func doApiHomeForecast(w http.ResponseWriter, r *http.Request) {
+// /api/home/forecast/poll handler
+func doApiHomeForecastPoll(w http.ResponseWriter, r *http.Request) {
   w.Header().Add("content-type", "application/json")
 
   // send cached forecast
@@ -193,8 +193,8 @@ var homeForecastCsvCols = []string {
   "Detailed Forecast",
 }
 
-// /api/home/download/forecast handler
-func doApiHomeDownloadForecast(w http.ResponseWriter, r *http.Request) {
+// /api/home/forecast/download handler
+func doApiHomeForecastDownload(w http.ResponseWriter, r *http.Request) {
   // build content-disposition header value
   disposition := fmt.Sprintf("attachment; filename=\"sensortron-forecast-%s.csv\"", timestampSuffix())
 
@@ -350,11 +350,11 @@ func main() {
 
   // add routes
   r.Post("/api/read", doApiRead)
-  r.Post("/api/home/poll", doApiHomePoll)
-  r.Post("/api/home/edit", doApiHomeEdit)
-  r.Get("/api/home/download/current", doApiHomeDownloadCurrent)
-  r.Post("/api/home/forecast", doApiHomeForecast)
-  r.Get("/api/home/download/forecast", doApiHomeDownloadForecast)
+  r.Post("/api/home/current/poll", doApiHomeCurrentPoll)
+  r.Post("/api/home/current/edit", doApiHomeCurrentEdit)
+  r.Get("/api/home/current/download", doApiHomeCurrentDownload)
+  r.Post("/api/home/forecast/poll", doApiHomeForecastPoll)
+  r.Get("/api/home/forecast/download", doApiHomeForecastDownload)
   r.Get("/", doHtmlFile("home.html"))
   r.Get("/about/", doHtmlFile("about.html"))
   r.Get("/forecasts/", doHtmlFile("forecasts.html"))
