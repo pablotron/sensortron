@@ -3,6 +3,7 @@ package main
 
 import (
   "context"
+  db_sql "database/sql"
   "encoding/csv"
   "encoding/json"
   "embed"
@@ -19,6 +20,9 @@ import (
   "github.com/go-chi/chi/v5"
   "github.com/go-chi/chi/v5/middleware"
 )
+
+// global database
+var db *db_sql.DB
 
 //go:embed res
 var resFs embed.FS
@@ -271,7 +275,7 @@ func fetchLatestObservations(ctx context.Context, stationId string) (SensorData,
   var observations nws.ObservationsResponse
 
   // get latest observations
-  _, body, err := nws.LatestObservations(ctx, "KDCA")
+  _, body, err := nws.LatestObservations(ctx, stationId)
   if err != nil {
     return SensorData{}, err
   }
@@ -291,23 +295,34 @@ func fetchLatestObservations(ctx context.Context, stationId string) (SensorData,
 }
 
 func main() {
+  // get config from environment
+  config := NewConfigFromEnv()
+  log.Printf("config = %#v", config)
+
   // get assets subdirectory from embedded resources
   assetsDir, err := io_fs.Sub(resFs, "res/assets")
   if err != nil {
     panic(err)
   }
 
+  // connect to database
+  db = dbOpen(config.DbPath)
+  defer db.Close()
+
   // fetch outside temperature every 10 minutes
   go func() {
     ctx := context.Background()
+
+    // parse sleep duration
     delay, err := time.ParseDuration("10m")
     if err != nil {
       panic(err)
     }
 
+    // loop forever
     for {
       // get latest observations as sensordata
-      if data, err := fetchLatestObservations(ctx, "KDCA"); err != nil {
+      if data, err := fetchLatestObservations(ctx, config.StationId); err != nil {
         log.Print(err)
       } else {
         log.Printf("NWS data = %#v", data)
@@ -322,14 +337,17 @@ func main() {
   // fetch current forecast every 4 hours
   go func() {
     ctx := context.Background()
+
+    // parse sleep duration
     delay, err := time.ParseDuration("4h")
     if err != nil {
       panic(err)
     }
 
+    // loop forever
     for {
       // get current forecast
-      _, body, err := nws.Forecast(ctx, "LWX", 91, 70)
+      _, body, err := nws.Forecast(ctx, config.Wfo, config.GridX, config.GridY)
       if err != nil {
         log.Print(err)
       } else {
@@ -340,6 +358,28 @@ func main() {
 
       // sleep until next fetch interval
       time.Sleep(delay)
+    }
+  }()
+
+  // add history entry every 15 minutes
+  go func() {
+    // loop forever
+    for {
+      now := time.Now()
+
+      // is minute of current time divisible by 15?
+      if now.Minute() % 15 == 0 {
+        // get unix timestamp, rounded to nearest 15 minutes
+        unix := now.Unix() - (now.Unix() % 900)
+
+        // log current entries to database
+        if err := dbHistoryInsert(db, unix, latest); err != nil {
+          log.Print(err)
+        }
+      }
+
+      // sleep for 1 minute (FIXME)
+      time.Sleep(time.Minute)
     }
   }()
 
