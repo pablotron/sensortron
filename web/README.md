@@ -28,7 +28,7 @@ Run `podman build -t sensortron .` to build an image.  Example:
 
 Use `podman run` to run the image.  Example:
 
-    > podman run -d --rm -p 1979:1979 --name sensortron sensortron
+    > podman run -d --rm -p 1979:1979 -v sensortron:/data --name sensortron sensortron
     a178d699787fcbaf92764b6104cbb4da719c364d406c1fbf69156fa78c13fa41
     > 
 
