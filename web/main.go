@@ -40,6 +40,9 @@ var names = map[string]string {
   "e6614c311b4b4537": "living room",
   "e6614c311b267237": "dining room",
   "e6614c311b867937": "nadine's office",
+  "e6614c311b427332": "basement",
+  "e6614c311b8e6237": "kitchen",
+  "e6614c311b956e32": "paul's office",
   "keylime": "bedroom",
 }
 
@@ -371,6 +374,7 @@ func main() {
       if now.Minute() % 15 == 0 {
         // get unix timestamp, rounded to nearest 15 minutes
         unix := now.Unix() - (now.Unix() % 900)
+        log.Printf("adding history, ts = %d", unix)
 
         // log current entries to database
         if err := dbHistoryInsert(db, unix, latest); err != nil {
