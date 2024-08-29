@@ -15,6 +15,7 @@ import (
   "sensortron/nws"
   "slices"
   "strings"
+  "sync"
   "time"
 
   "github.com/go-chi/chi/v5"
@@ -49,6 +50,15 @@ var names = map[string]string {
 // latest values
 var latest = make(map[string]SensorData)
 
+var latestMutex sync.Mutex
+
+// Prevent concurrent writes to latest.
+func setLatest(key string, data SensorData) {
+  latestMutex.Lock()
+  latest[key] = data
+  latestMutex.Unlock()
+}
+
 // /api/read handler
 func doApiRead(w http.ResponseWriter, r *http.Request) {
   // decode sensor readings from request body
@@ -61,11 +71,12 @@ func doApiRead(w http.ResponseWriter, r *http.Request) {
 
   // get unique id and pseudo-mac
   id := r.Header.Get("x-unique-id")
-  mac := r.Header.Get("x-pseudo-mac-sha256")
+  // FIXME: mac is currently not verified
+  // mac := r.Header.Get("x-pseudo-mac-sha256")
 
   // save latest values, log result
-  latest[id] = data
-  log.Printf("id = %s, mac = %s, data = %#v", id, mac, data)
+  setLatest(id, data)
+  // log.Printf("DEBUG: id = %s, mac = %s, data = %#v", id, mac, data)
 
   // respond with success
   w.Header().Add("content-type", "application/json")
@@ -328,8 +339,8 @@ func main() {
       if data, err := fetchLatestObservations(ctx, config.StationId); err != nil {
         log.Print(err)
       } else {
-        log.Printf("NWS data = %#v", data)
-        latest["outside"] = data
+        // log.Printf("DEBUG: NWS data = %#v", data)
+        setLatest("outside", data)
       }
 
       // sleep until next fetch interval
