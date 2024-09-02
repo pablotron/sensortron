@@ -52,11 +52,23 @@ var latest = make(map[string]SensorData)
 
 var latestMutex sync.Mutex
 
-// Prevent concurrent writes to latest.
-func setLatest(key string, data SensorData) {
+// Set latest data for given sensor ID and add sensor to sensors
+// database table if it is not present.  Wrapped in mutex to prevent
+// concurrent writes.
+func setLatest(id string, data SensorData) error {
   latestMutex.Lock()
-  latest[key] = data
+
+  if _, exists := latest[id]; !exists {
+    // add sensor if it is not present in sensors table
+    if err := dbSensorInsert(db, id, defaultColor(id)); err != nil {
+      return err
+    }
+  }
+
+  latest[id] = data
   latestMutex.Unlock()
+
+  return nil
 }
 
 // /api/read handler
@@ -74,8 +86,13 @@ func doApiRead(w http.ResponseWriter, r *http.Request) {
   // FIXME: mac is currently not verified
   // mac := r.Header.Get("x-pseudo-mac-sha256")
 
-  // save latest values, log result
-  setLatest(id, data)
+  // save latest sensor values
+  if err := setLatest(id, data); err != nil {
+    log.Print(err) // log error
+    http.Error(w, "error", 500)
+    return
+  }
+
   // log.Printf("DEBUG: id = %s, mac = %s, data = %#v", id, mac, data)
 
   // respond with success
@@ -340,7 +357,9 @@ func main() {
         log.Print(err)
       } else {
         // log.Printf("DEBUG: NWS data = %#v", data)
-        setLatest("outside", data)
+        if err := setLatest("outside", data); err != nil {
+          panic(err)
+        }
       }
 
       // sleep until next fetch interval
