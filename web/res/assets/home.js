@@ -116,7 +116,8 @@
   const current_el = document.getElementById('current'),
         forecast_el = document.getElementById('forecast');
 
-  const poll = () => fetch('/api/home/current/poll', { method: 'POST' }).then(
+  // poll for current sensor measurements
+  const poll_current = () => fetch('/api/home/current/poll', { method: 'POST' }).then(
     (r) => r.json()
   ).then((r) => {
     const unit = UNITS[document.querySelector('input.unit[type="radio"]:checked').value],
@@ -124,12 +125,25 @@
     current_el.innerHTML = T.current_table(unit, rows);
   });
 
-  const forecast = () => fetch('/api/home/forecast/poll', { method: 'POST' }).then(
+  // poll for current forecast
+  const poll_forecast = () => fetch('/api/home/forecast/poll', { method: 'POST' }).then(
     (r) => r.json()
   ).then((r) => {
     forecast_el.dataset.forecast = JSON.stringify(r);
     const rows = r.properties.periods.slice(0, 4);
     forecast_el.innerHTML = rows.map((row) => T.forecast_row(row)).join('');
+  });
+
+  // poll for current chart data
+  const poll_charts = () => fetch('/api/home/charts/poll', { method: 'POST' }).then(
+    (r) => r.json()
+  ).then((r) => {
+    for (let k of Object.keys(r)) {
+      if (k in charts) {
+        charts[k].data = r[k];
+        charts[k].update();
+      }
+    }
   });
 
   // bind click events
@@ -157,11 +171,31 @@
     }
   }, true);
 
-  // poll for current data
-  setInterval(poll, 10000); // 10s
-  poll();
+  // poll for current sensor measurements
+  setInterval(poll_current, 10000); // 10s
+  poll_current();
 
-  // poll for forecast
-  setInterval(forecast, 30 * 60000); // 30m
-  forecast();
+  // poll for current forecast
+  setInterval(poll_forecast, 30 * 60000); // 30m
+  poll_forecast();
+
+  // init chart
+  const charts = {
+    t: new Chart(document.getElementById('chart-t'), {
+      type: 'line',
+      data: {},
+      options: {
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    }),
+  };
+
+  // poll for chart data
+  setInterval(poll_charts, 5 * 60000); // 5m
+  poll_charts();
 })();
