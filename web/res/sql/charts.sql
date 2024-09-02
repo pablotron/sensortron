@@ -1,17 +1,33 @@
+DROP VIEW IF EXISTS charts;
 CREATE VIEW charts(data) AS
-  WITH times AS (
-    SELECT value AS ts,
-           datetime(value, 'unixepoch', 'localtime') AS s
-      FROM generate_series(
-        -- start time (24 hours ago)
-        unixepoch() - unixepoch() % (15*60) - 24*60*60,
+  -- normally we would use generate_series(), but the modernc.org/sqlite
+  -- driver does not implement the series extension
+  WITH RECURSIVE times(ts, s) AS (
+    -- start time (24 hours ago)
+    SELECT unixepoch() - unixepoch() % (15*60) - 24*60*60,
+           datetime(unixepoch() - unixepoch() % (15*60) - 24*60*60, 'unixepoch', 'localtime')
 
-        -- end time (most recent 15 minute tick)
-        unixepoch() - unixepoch() % (15*60),
+    UNION ALL
 
-        -- time series increment (15 minutes)
-        15*60
-      )
+    -- next value (increment by 15 minutes)
+    SELECT ts + (15*60),
+           datetime(ts + (15*60), 'unixepoch', 'localtime')
+      FROM times
+        -- next value (increment by 15 minutes)
+     WHERE ts + (15*60) <= (unixepoch() - unixepoch() % (15*60))
+  -- ), times AS (
+  --   SELECT value AS ts,
+  --          datetime(value, 'unixepoch', 'localtime') AS s
+  --     FROM generate_series(
+  --       -- start time (24 hours ago)
+  --       unixepoch() - unixepoch() % (15*60) - 24*60*60,
+
+  --       -- end time (most recent 15 minute tick)
+  --       unixepoch() - unixepoch() % (15*60),
+
+  --       -- time series increment (15 minutes)
+  --       15*60
+  --     )
   ), types AS (
     -- chart types
     SELECT column1 AS id, -- chart id ("t" or "h")
