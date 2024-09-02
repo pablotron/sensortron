@@ -118,3 +118,15 @@ func dbSensorInsert(db *db_sql.DB, id, color string) error {
   _, err := db.Exec(sensorInsertSql, id, color)
   return err
 }
+
+var chartDataSql = `
+  SELECT data FROM charts
+`
+
+// Read chart data from charts view and return string containing
+// JSON-encoded chart data.
+func dbChartData(db *db_sql.DB) (string, error) {
+  var s string
+  err := db.QueryRow(chartDataSql).Scan(&s)
+  return s, err
+}
