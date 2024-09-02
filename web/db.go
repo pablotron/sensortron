@@ -30,7 +30,7 @@ func dbTableExists(db *db_sql.DB, tableName string) (bool, error) {
     return false, errTableExistsFailed
   }
 
-  // scan into 
+  // scan into
   var r bool
   if err := rows.Scan(&r); err != nil {
     return false, err
@@ -98,5 +98,23 @@ func dbHistoryInsert(db *db_sql.DB, ts int64, data map[string]SensorData) error 
 
   // insert row
   _, err = db.Exec(historyInsertSql, ts, buf)
+  return err
+}
+
+var sensorInsertSql = `
+  INSERT INTO sensors(id, name, color, sort)
+    SELECT a.column1, -- id
+           a.column1, -- name
+           a.column2, -- color
+           0          -- sort
+      FROM (VALUES (?, ?)) a
+     WHERE a.column1 NOT IN (SELECT id FROM sensors)
+`
+
+// Insert sensor into sensors table with if the sensor does not already
+// exist in the sensors table.
+func dbSensorInsert(db *db_sql.DB, id, color string) error {
+  // insert row
+  _, err := db.Exec(sensorInsertSql, id, color)
   return err
 }
