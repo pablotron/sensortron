@@ -17,9 +17,9 @@ CREATE VIEW charts(data) AS
   --   https://www.sqlite.org/series.html
   --
   WITH RECURSIVE times(ts, s) AS (
-    -- start time (24 hours ago)
-    SELECT unixepoch() - unixepoch() % (15*60) - 24*60*60,
-           datetime(unixepoch() - unixepoch() % (15*60) - 24*60*60, 'unixepoch', 'localtime')
+    -- start time (48 hours ago)
+    SELECT unixepoch() - unixepoch() % (15*60) - 48*60*60,
+           datetime(unixepoch() - unixepoch() % (15*60) - 48*60*60, 'unixepoch', 'localtime')
 
     UNION ALL
 
