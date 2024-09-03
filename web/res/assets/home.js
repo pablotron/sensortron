@@ -200,20 +200,56 @@
       </tr>
     `,
 
-    forecast_row: ({name, icon, shortForecast, detailedForecast, temperature, windSpeed, windDirection}) => `
-      <li class='list-group-item'>
+    forecast_row: (row) => `
+      <li
+        class='list-group-item'
+        title='${h(row.name)}: ${h(row.detailedForecast)}'
+        aria-label='${h(row.name)}: ${h(row.detailedForecast)}'
+        data-row='${h(JSON.stringify(row))}'
+        data-bs-toggle='modal'
+        data-bs-target='#period-dialog'
+      >
         <img
-          src='${icon}'
+          src='${h(row.icon)}'
           class='rounded float-start me-2'
-          title='${h(name)}: ${h(shortForecast)}'
-          aria-label='${h(name)}: ${h(shortForecast)}'
-          alt='${h(name)}: ${h(shortForecast)}'
+          title='${h(row.name)}: ${h(row.detailedForecast)}'
+          aria-label='${h(row.name)}: ${h(row.detailedForecast)}'
+          alt='${h(row.name)}: ${h(row.detailedForecast)}'
         />
 
-        <h5>${h(name)}</h5>
-        Temperature: <b>${temperature} F</b>, Wind: ${windSpeed} ${windDirection}<br/>
-        ${h(shortForecast)}
+        <h5>${h(row.name)}</h5>
+        Temperature: <b>${row.temperature}&deg;F</b>,
+        Rain: <b>${row.probabilityOfPrecipitation.value ?? '0'}%</b><br/>
+        ${h(row.shortForecast)}
       </li>
+    `,
+
+    period_dialog_body: (row) => `
+      <img
+        src='${h(row.icon)}'
+        class='rounded float-start me-2'
+        title='${h(row.name)}: ${h(row.detailedForecast)}'
+        aria-label='${h(row.name)}: ${h(row.detailedForecast)}'
+        alt='${h(row.name)}: ${h(row.detailedForecast)}'
+      />
+
+      <dl class='row'>
+        <dt class='col-sm-3'>Time</dt>
+        <dd class='col-sm-9'>${h(row.start)} - ${h(row.end)}</dd>
+
+        <dt class='col-sm-3'>Temperature</dt>
+        <dd class='col-sm-9'>${row.temperature}&deg;F</dd>
+
+        <dt class='col-sm-3'>Precipitation</dt>
+        <dd class='col-sm-9'>${row.probabilityOfPrecipitation.value ?? '0'}%</dd>
+
+        <dt class='col-sm-3'>Wind</dt>
+        <dd class='col-sm-9'>${row.windSpeed} ${row.windDirection}</dd>
+      </dl>
+
+      <p>
+        ${h(row.detailedForecast)}
+      </p>
     `,
   };
 
@@ -269,7 +305,7 @@
     e.addEventListener('click', () => { setTimeout(poll_current, 10) })
   });
 
-  // bind to click events on names
+  // bind to current entry click events
   current_el.addEventListener('click', (ev) => {
     if (ev.target.tagName === 'A') {
       const data = ev.target.dataset;
@@ -288,6 +324,18 @@
       }
     }
   }, true);
+
+  // populate period dialog when shown
+  document.getElementById('period-dialog').addEventListener('show.bs.modal', (ev) => {
+    // parse row, format dates
+    const row = JSON.parse(ev.relatedTarget.dataset.row);
+    row.start = (new Date(row.startTime)).toLocaleString();
+    row.end = (new Date(row.endTime)).toLocaleString();
+
+    // render modal title and body
+    document.getElementById('period-dialog-title').textContent = row.name;
+    document.getElementById('period-dialog-body').innerHTML = T.period_dialog_body(row);
+  });
 
   // bind click events on time filter
   document.querySelectorAll('input.time, label.time').forEach((e) => {
