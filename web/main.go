@@ -13,8 +13,6 @@ import (
   "log"
   "net/http"
   "sensortron/nws"
-  "slices"
-  "strings"
   "sync"
   "time"
 
@@ -29,23 +27,20 @@ var db *db_sql.DB
 //go:embed res
 var resFs embed.FS
 
+// Sensor properties
+type Sensor struct {
+  Id string `json:"id"` // unique ID
+  Name string `json:"name"` // Display name
+  Color string `json:"color"` // Chart color
+  Sort int `json:"sort"` // Sort order
+}
+
 // bme280 sensor data
 type SensorData struct {
   T float32 `json:"t"` // temperature, in degrees celcius
   H float32 `json:"h"` // humidity, percentage
   P float32 `json:"p"` // pressure, in pascals
   E string `json:"e"` // rfc3339-formatted timestamp
-}
-
-// id to friendly name
-var names = map[string]string {
-  "e6614c311b4b4537": "living room",
-  "e6614c311b267237": "dining room",
-  "e6614c311b867937": "nadine's office",
-  "e6614c311b427332": "basement",
-  "e6614c311b8e6237": "kitchen",
-  "e6614c311b956e32": "paul's office",
-  "keylime": "bedroom",
 }
 
 // latest values
@@ -105,38 +100,39 @@ func doApiRead(w http.ResponseWriter, r *http.Request) {
 }
 
 type PollRow struct {
-  Id string `json:"id"` // sensor ID
-  Name string `json:"name"` // room name
+  Sensor Sensor `json:"sensor"` // sensor properties
   Data SensorData `json:"data"` // sensor data
 }
 
 // Get a slice of poll rows sorted by room name.
-func getPollRows() []PollRow {
-  // build list of sensor readings
-  rows := make([]PollRow, 0, len(latest))
-  for id, sr := range(latest) {
-    // get room name
-    name := names[id]
-    if name == "" {
-      name = id
-    }
-
-    // append to rows
-    rows = append(rows, PollRow { id, name, sr })
+func getPollRows() ([]PollRow, error) {
+  // get sensors
+  sensors, err := dbSensors(db)
+  if err != nil {
+    return []PollRow{}, err
   }
 
-  // sort rows by name
-  slices.SortFunc(rows, func(a, b PollRow) int {
-		return strings.Compare(a.Name, b.Name)
-	})
+  // build result
+  rows := make([]PollRow, 0, len(latest))
+  for _, sensor := range(sensors) {
+    if data, ok := latest[sensor.Id]; ok {
+      rows = append(rows, PollRow { sensor, data })
+    }
+  }
 
-  return rows
+  // return result
+  return rows, nil
 }
 
 // /api/home/current/poll handler
 func doApiHomeCurrentPoll(w http.ResponseWriter, r *http.Request) {
   // get sorted list of latest readings
-  rows := getPollRows()
+  rows, err := getPollRows()
+  if err != nil {
+    log.Print(err) // log error
+    http.Error(w, "error", 500)
+    return
+  }
 
   // return rows
   w.Header().Add("content-type", "application/json")
@@ -150,16 +146,18 @@ func doApiHomeCurrentPoll(w http.ResponseWriter, r *http.Request) {
 // /api/home/current/edit handler
 func doApiHomeCurrentEdit(w http.ResponseWriter, r *http.Request) {
   // parse args
-  var args map[string]string
-  if err := json.NewDecoder(r.Body).Decode(&args); err != nil {
+  var sensor Sensor
+  if err := json.NewDecoder(r.Body).Decode(&sensor); err != nil {
     log.Print(err) // log error
     http.Error(w, "error", 500)
     return
   }
 
-  if len(args["name"]) > 0 {
-    // save name
-    names[args["id"]] = args["name"]
+  // save changes
+  if err := dbSensorUpdate(db, sensor); err != nil {
+    log.Print(err) // log error
+    http.Error(w, "error", 500)
+    return
   }
 
   // respond with success
@@ -181,12 +179,20 @@ func doApiHomeCurrentDownload(w http.ResponseWriter, r *http.Request) {
   // build content-disposition header value
   disposition := fmt.Sprintf("attachment; filename=\"sensortron-current-data-%s.csv\"", timestampSuffix())
 
+  // get poll rows
+  pollRows, err := getPollRows()
+  if err != nil {
+    log.Print(err) // log error
+    http.Error(w, "error", 500)
+    return
+  }
+
   // build csv rows
   rows := make([][]string, 0, len(latest) + 1)
   rows = append(rows, []string { "Location", "Temperature (F)", "Humidity (%)" })
-  for _, row := range(getPollRows()) {
+  for _, row := range(pollRows) {
     rows = append(rows, []string {
-      row.Name,
+      row.Sensor.Name,
       fmt.Sprintf("%2.2f", row.Data.T * 9.0/5.0 + 32.0),
       fmt.Sprintf("%2.1f", row.Data.H * 100.0),
     })
