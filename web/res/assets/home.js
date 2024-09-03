@@ -165,35 +165,42 @@
       <tbody>${rows}</tbody>
     `,
 
-    current_row: (unit, {id, name, data}) => `
-      <tr id='${id}'>
+    current_row: (unit, {sensor, data}) => `
+      <tr id='${h(sensor.id)}'>
         <td
           title='Sensor location.'
           aria-label='Sensor location.'
         >
           <a
             href='#'
-            data-id='${id}'
-            data-name='${h(name)}'
+
             title='Sensor location.'
             aria-label='Sensor location.'
+
+            data-bs-toggle='modal'
+            data-bs-target='#edit-dialog'
+
+            data-id='${h(sensor.id)}'
+            data-name='${h(sensor.name)}'
+            data-color='${h(sensor.color)}'
+            data-sort='${h(sensor.sort)}'
           >
-            ${h(name)}
+            ${h(sensor.name)}
           </a>
         </td>
 
         <td
           style='text-align: right'
-          title='${h(name)} temperature (${unit.abbr}).'
-          aria-label='${h(name)} temperature (${unit.abbr}).'
+          title='${h(sensor.name)} temperature (${unit.abbr}).'
+          aria-label='${h(sensor.name)} temperature (${unit.abbr}).'
         >
           ${(data.t * unit.m + unit.b).toFixed(2)}
         </td>
 
         <td
           style='text-align: right'
-          title='Humidity in ${h(name)}.'
-          aria-label='Humidity in ${h(name)}.'
+          title='Humidity in ${h(sensor.name)}.'
+          aria-label='Humidity in ${h(sensor.name)}.'
         >
           ${(data.h * 100).toFixed(1)}%
         </td>
