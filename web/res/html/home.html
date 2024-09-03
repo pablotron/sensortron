@@ -238,6 +238,50 @@
                 <canvas id='chart-h'></canvas>
               </div>
             </div><!-- card-body -->
+
+            <div class='card-footer'>
+              <div class='btn-toolbar justify-content-between'>
+                <div class='btn-group dropup dropup-center' role='group'>
+                  <button
+                    type='button'
+                    class='btn btn-sm btn-primary dropdown-toggle'
+                    data-bs-toggle='dropdown'
+                    aria-expanded='false'
+                    title='Download chart as PNG file.'
+                    aria-label='Download chart as PNG file.'
+                  >
+                    Download
+                  </button><!-- dropdown-toggle -->
+                  <ul class='dropdown-menu'>
+                    <li>
+                      <button
+                        type='button'
+                        class='dropdown-item chart-download'
+                        title='Download temperature chart as PNG file.'
+                        aria-label='Download temperature chart as PNG file.'
+                        data-id='t'
+                        data-name='sensortron-temperature.png'
+                      >
+                        Temperature
+                      </button>
+                    </li>
+
+                    <li>
+                      <button
+                        type='button'
+                        class='dropdown-item chart-download'
+                        title='Download humidity chart as PNG file.'
+                        aria-label='Download humidity chart as PNG file.'
+                        data-id='h'
+                        data-name='sensortron-humidity.png'
+                      >
+                        Humidity
+                      </button>
+                    </li>
+                  </ul><!-- dropdown-menu -->
+                </div><!-- btn-group -->
+              </div><!-- btn-toolbar -->
+            </div><!-- card-footer -->
           </div><!-- card -->
         </div><!-- col -->
 
