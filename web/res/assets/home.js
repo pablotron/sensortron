@@ -205,9 +205,9 @@
         <img
           src='${icon}'
           class='rounded float-start me-2'
-          title='${h(name)): ${h(shortForecast)}'
-          aria-label='${h(name)): ${h(shortForecast)}'
-          alt='${h(name)): ${h(shortForecast)}'
+          title='${h(name)}: ${h(shortForecast)}'
+          aria-label='${h(name)}: ${h(shortForecast)}'
+          alt='${h(name)}: ${h(shortForecast)}'
         />
 
         <h5>${h(name)}</h5>
