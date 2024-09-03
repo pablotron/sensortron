@@ -267,6 +267,45 @@ func doApiHomeForecastDownload(w http.ResponseWriter, r *http.Request) {
   }
 }
 
+// // chart data set
+// type ChartDataset struct {
+//   Label string `json:"label"` // label (shown in legend)
+//   Data []float32 `json:"data"` // data points
+//   BorderWidth int `json:"borderWidth"` // border width
+//   BorderColor string `json:"borderColor"` // border color
+//   // BackgroundColor string `json:"backgroundColor"` // background color
+// }
+//
+// type Chart struct {
+//   Labels []string `json:"labels"` // X axis labels
+//   Datasets []ChartDataset `json:"datasets"` // data sets
+// }
+//
+// var mockCharts = map[string]Chart {
+//   "t": Chart {
+//     Labels: []string { "Red", "Blue", "Yellow", "Green", "Purple", "Orange" },
+//     Datasets: []ChartDataset {
+//       ChartDataset {
+//         Label: "# of Votes",
+//         Data: []float32 { 12, 19, 3, 5, 2, 3 },
+//         BorderWidth: 1,
+//         BorderColor: "#ffaa00",
+//       },
+//       ChartDataset {
+//         Label: "# of Votes",
+//         Data: []float32 { 3, 5, 2, 3, 12, 19 },
+//         BorderWidth: 1,
+//         BorderColor: "#00aaff",
+//       },
+//     },
+//   },
+// }
+//
+// // Get charts (TODO: use for doApiHomeChartsPoll())
+// func getCharts() (map[string]Chart, error) {
+//   return mockCharts, nil
+// }
+
 // return handler which sends named HTML file.
 func doHtmlFile(name string) func(http.ResponseWriter, *http.Request) {
   // build full path
