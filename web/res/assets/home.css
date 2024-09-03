@@ -1,0 +1,18 @@
+div.chart-wrapper {
+  position: relative;
+  height: 40vh;
+}
+
+@media (orientation: landscape) {
+  div.chart-wrapper {
+    position: relative;
+    height: 100vh;
+  }
+}
+
+@media (orientation: portrait) {
+  div.chart-wrapper {
+    position: relative;
+    height: 40vh;
+  }
+}
