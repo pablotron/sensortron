@@ -27,6 +27,60 @@
     },
   };
 
+  // chart options
+  const CHART_OPTIONS = [{
+    id: 't',
+    options: {
+      maintainAspectRatio: false,
+
+      scales: {
+        y: {
+          title: {
+            display: true,
+            text: 'Temperature (°F)',
+          },
+
+          grid: { display: false },
+        },
+
+        x: {
+          type: 'time',
+
+          title: {
+            display: true,
+            text: 'Time',
+          },
+
+          ticks: {
+            // limit maximum number of ticks
+            maxTicksLimit: 8,
+          },
+
+          grid: { display: false },
+          time: {
+            minUnit: 'hour',
+
+            // ref: https://date-fns.org/v3.6.0/docs/format
+            tooltipFormat: 'MM/dd HH:mm',
+          },
+        },
+      },
+
+      plugins: {
+        title: {
+          display: true,
+          text: 'Temperature',
+          font: { weight: 'bold', size: 18 },
+        },
+
+        tooltip: {
+          mode: 'nearest',
+          intersect: false,
+        },
+      },
+    },
+  }];
+
   // templates
   const T = {
     current_table: (unit, rows) => `
@@ -179,58 +233,16 @@
   setInterval(poll_forecast, 30 * 60000); // 30m
   poll_forecast();
 
-  // init chart
+  // init charts
   Chart.defaults.color = '#eee';
-  const charts = {
-    t: new Chart(document.getElementById('chart-t'), {
+  const charts = CHART_OPTIONS.reduce((r, {id, options}) => {
+    r[id] = new Chart(document.getElementById('chart-' + id), {
       type: 'line',
       data: {},
-      options: {
-        maintainAspectRatio: false,
-
-        scales: {
-          y: {
-            title: {
-              display: true,
-              text: 'Temperature (°F)',
-            },
-
-            grid: { display: false },
-          },
-
-          x: {
-            type: 'time',
-
-            title: {
-              display: true,
-              text: 'Time',
-            },
-
-            grid: { display: false },
-            time: {
-              minUnit: 'hour',
-
-              // ref: https://date-fns.org/v3.6.0/docs/format
-              tooltipFormat: 'MM/dd HH:mm',
-            },
-          },
-        },
-
-        plugins: {
-          title: {
-            display: true,
-            text: 'Temperature',
-            font: { weight: 'bold', size: 18 },
-          },
-
-          tooltip: {
-            mode: 'nearest',
-            intersect: false,
-          },
-        },
-      },
-    }),
-  };
+      options: options,
+    });
+    return r;
+  }, {});
 
   // poll for chart data
   setInterval(poll_charts, 5 * 60000); // 5m
