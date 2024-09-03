@@ -189,7 +189,7 @@ func doApiHomeCurrentDownload(w http.ResponseWriter, r *http.Request) {
 
   // build csv rows
   rows := make([][]string, 0, len(latest) + 1)
-  rows = append(rows, []string { "Location", "Temperature (F)", "Humidity (%)" })
+  rows = append(rows, []string { "Name", "Temperature (F)", "Humidity (%)" })
   for _, row := range(pollRows) {
     rows = append(rows, []string {
       row.Sensor.Name,
@@ -229,6 +229,7 @@ func doApiHomeForecastPoll(w http.ResponseWriter, r *http.Request) {
 var homeForecastCsvCols = []string {
   "Period",
   "Temperature (F)",
+  "Precipitation (%)",
   "Wind Speed",
   "Wind Direction",
   "Short Forecast",
@@ -252,9 +253,17 @@ func doApiHomeForecastDownload(w http.ResponseWriter, r *http.Request) {
   rows := make([][]string, 0, len(latest) + 1)
   rows = append(rows, homeForecastCsvCols)
   for _, row := range(forecast.Properties.Periods) {
+    // get probability of precipitation
+    probPrecip := "0"
+    if row.ProbabilityOfPrecipitation.Value != nil {
+      probPrecip = fmt.Sprintf("%2.0f", *row.ProbabilityOfPrecipitation.Value)
+    }
+
+    // build row, append to results
     rows = append(rows, []string {
       row.Name,
       fmt.Sprintf("%d", row.Temperature),
+      probPrecip,
       row.WindSpeed,
       row.WindDirection,
       row.ShortForecast,
