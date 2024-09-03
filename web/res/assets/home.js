@@ -279,6 +279,17 @@
     `,
   };
 
+  // download file with given name and data
+  const download = (name, data) => {
+    let a = document.createElement('a');
+    a.download = name;
+    a.href = data;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    a = null;
+  };
+
   // cache current data wrapper and forecast wrapper
   const current_el = document.getElementById('current'),
         forecast_el = document.getElementById('forecast');
@@ -379,9 +390,17 @@
     document.getElementById('period-dialog-body').innerHTML = T.period_dialog_body(row);
   });
 
-  // bind click events on time filter
+  // time filter btn click event handler
   document.querySelectorAll('input.time, label.time').forEach((e) => {
     e.addEventListener('click', () => { setTimeout(poll_charts, 10) })
+  });
+
+  // chart download btn click event handler
+  document.querySelectorAll('.chart-download').forEach((e) => {
+    e.addEventListener('click', () => {
+      download(e.dataset.name, charts[e.dataset.id].toBase64Image());
+      setTimeout(() => document.body.click(), 10);
+    });
   });
 
   // poll for current sensor measurements
