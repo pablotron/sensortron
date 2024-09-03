@@ -130,7 +130,7 @@
     (r) => r.json()
   ).then((r) => {
     forecast_el.dataset.forecast = JSON.stringify(r);
-    const rows = r.properties.periods.slice(0, 4);
+    const rows = r.properties.periods.slice(0, 8);
     forecast_el.innerHTML = rows.map((row) => T.forecast_row(row)).join('');
   });
 
