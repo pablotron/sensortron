@@ -138,10 +138,10 @@
       <thead>
         <tr>
           <th
-            title='Sensor location.'
-            aria-label='Sensor location.'
+            title='Sensor name.'
+            aria-label='Sensor name.'
           >
-            Location
+            Name
           </th>
 
           <th
@@ -168,14 +168,14 @@
     current_row: (unit, {sensor, data}) => `
       <tr id='${h(sensor.id)}'>
         <td
-          title='Sensor location.'
-          aria-label='Sensor location.'
+          title='Sensor name.'
+          aria-label='Sensor name.'
         >
           <a
             href='#'
 
-            title='Sensor location.'
-            aria-label='Sensor location.'
+            title='Sensor name.'
+            aria-label='Sensor name.'
 
             data-bs-toggle='modal'
             data-bs-target='#edit-dialog'
