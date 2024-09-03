@@ -245,11 +245,10 @@
 
         <dt class='col-sm-3'>Wind</dt>
         <dd class='col-sm-9'>${row.windSpeed} ${row.windDirection}</dd>
-      </dl>
 
-      <p>
-        ${h(row.detailedForecast)}
-      </p>
+        <dt class='col-sm-3'>Forecast</dt>
+        <dd class='col-sm-9'>${h(row.detailedForecast)}</dd>
+      </dl>
     `,
   };
 
