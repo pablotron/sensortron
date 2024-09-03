@@ -1,3 +1,4 @@
+BEGIN;
 DROP VIEW IF EXISTS charts;
 CREATE VIEW charts(data) AS
   -- normally we would use generate_series(), but the modernc.org/sqlite
@@ -63,7 +64,11 @@ CREATE VIEW charts(data) AS
                -- cubic interpolation (not working)
                -- ref: https://www.chartjs.org/docs/latest/samples/line/interpolation.html
                'tension', 0.4,
-               'cubicInterpolationMode', 'monotone',
+
+               -- span gaps (also not working)
+               -- ref: https://www.chartjs.org/docs/latest/charts/line.html#line-styling
+               -- 'spanGaps', true,
+               -- 'showLine', true,
 
                -- data set measurements
                'data', (
@@ -86,12 +91,10 @@ CREATE VIEW charts(data) AS
                )
              ))
 
-        FROM sensors
-
-       -- sort sensors by sort column, then by name (case-insensitive)
-       ORDER BY sensors.sort,
-                LOWER(sensors.name)
+        FROM (
+          -- sort sensors by sort, then name (case-insensitive)
+          SELECT * FROM sensors ORDER BY sort, LOWER(name)
+        ) sensors
     )
   )) FROM types;
-
--- json_object('data', json_group_array(b.data ->>'$."' || ) from times a left join history b on b.ts = a.ts; -- SELECT a.ts, a.s, b.data ->> '$."outside".t' as t from times a left join history b on b.ts = a.ts order by a.ts desc limit 50;
+COMMIT;
