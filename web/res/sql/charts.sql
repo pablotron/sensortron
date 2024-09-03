@@ -60,6 +60,8 @@ CREATE VIEW charts(data) AS
                -- data set line style
                'borderWidth', 1,
                'borderColor', sensors.color,
+               'backgroundColor', sensors.color,
+               'fill', false,
 
                -- cubic interpolation (not working)
                -- ref: https://www.chartjs.org/docs/latest/samples/line/interpolation.html
