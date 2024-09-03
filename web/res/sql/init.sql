@@ -29,7 +29,11 @@ CREATE INDEX in_history_ts ON history(ts);
 DROP VIEW IF EXISTS charts;
 CREATE VIEW charts(data) AS
   -- normally we would use generate_series(), but the modernc.org/sqlite
-  -- driver does not implement the series extension
+  -- driver does not implement the "series" extension.  instead, we're
+  -- using a modified version of the recursive CTE suggested here:
+  --
+  --   https://www.sqlite.org/series.html
+  --
   WITH RECURSIVE times(ts, s) AS (
     -- start time (24 hours ago)
     SELECT unixepoch() - unixepoch() % (15*60) - 24*60*60,
@@ -83,6 +87,11 @@ CREATE VIEW charts(data) AS
                -- data set line style
                'borderWidth', 1,
                'borderColor', sensors.color,
+
+               -- cubic interpolation (not working)
+               -- ref: https://www.chartjs.org/docs/latest/samples/line/interpolation.html
+               'tension', 0.4,
+               'cubicInterpolationMode', 'monotone',
 
                -- data set measurements
                'data', (
