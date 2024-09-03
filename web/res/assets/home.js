@@ -192,8 +192,21 @@
   const poll_charts = () => fetch('/api/home/charts/poll', { method: 'POST' }).then(
     (r) => r.json()
   ).then((r) => {
+    // get hours, convert to slice start
+    const start = 4 * -document.querySelector('input.time[type="radio"]:checked').value;
     for (let k of Object.keys(r)) {
       if (k in charts) {
+        {
+          // filter chart data based on time filter
+          const labels = r[k].labels.slice(start),
+                datasets = r[k].datasets.map((set) => {
+                  set.data = set.data.slice(start);
+                  return set;
+                });
+          r[k].labels = labels;
+          r[k].datasets = datasets;
+        }
+
         charts[k].data = r[k];
         charts[k].update();
       }
@@ -202,7 +215,7 @@
 
   // bind click events
   document.querySelectorAll('input.unit, label.unit').forEach((e) => {
-    e.addEventListener('click', () => { setTimeout(poll, 10) })
+    e.addEventListener('click', () => { setTimeout(poll_current, 10) })
   });
 
   // bind to click events on names
@@ -220,10 +233,15 @@
             id: data.id,
             name: name,
           }),
-        }).then((r) => poll());
+        }).then((r) => poll_current());
       }
     }
   }, true);
+
+  // bind click events on time filter
+  document.querySelectorAll('input.time, label.time').forEach((e) => {
+    e.addEventListener('click', () => { setTimeout(poll_charts, 10) })
+  });
 
   // poll for current sensor measurements
   setInterval(poll_current, 10000); // 10s
