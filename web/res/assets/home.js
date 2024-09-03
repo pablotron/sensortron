@@ -329,7 +329,7 @@
         id: document.getElementById('edit-id').value,
         name: document.getElementById('edit-name').value,
         color: document.getElementById('edit-color').value,
-        sort: document.getElementById('edit-sort').value,
+        sort: +document.getElementById('edit-sort').value,
       }),
     }).then((r) => {
       if (!r.ok) {
