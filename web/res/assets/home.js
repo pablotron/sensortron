@@ -180,13 +180,55 @@
   poll_forecast();
 
   // init chart
+  Chart.defaults.color = '#eee';
   const charts = {
     t: new Chart(document.getElementById('chart-t'), {
       type: 'line',
       data: {},
       options: {
         maintainAspectRatio: false,
-      }
+
+        scales: {
+          y: {
+            title: {
+              display: true,
+              text: 'Temperature (°F)',
+            },
+
+            grid: { display: false },
+          },
+
+          x: {
+            type: 'time',
+
+            title: {
+              display: true,
+              text: 'Time',
+            },
+
+            grid: { display: false },
+            time: {
+              minUnit: 'hour',
+
+              // ref: https://date-fns.org/v3.6.0/docs/format
+              tooltipFormat: 'MM/dd HH:mm',
+            },
+          },
+        },
+
+        plugins: {
+          title: {
+            display: true,
+            text: 'Temperature',
+            font: { weight: 'bold', size: 18 },
+          },
+
+          tooltip: {
+            mode: 'nearest',
+            intersect: false,
+          },
+        },
+      },
     }),
   };
 
