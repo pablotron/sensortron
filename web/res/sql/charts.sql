@@ -53,19 +53,13 @@ CREATE VIEW charts(data) AS
                -- data set label (sensor name)
                'label', sensors.name,
 
-               -- data set line style
-               'borderWidth', 1,
-               'borderColor', sensors.color,
-               'backgroundColor', sensors.color,
-
-               -- cubic interpolation (not working)
-               -- ref: https://www.chartjs.org/docs/latest/samples/line/interpolation.html
-               'tension', 0.4,
-
-               -- span gaps (also not working)
-               -- ref: https://www.chartjs.org/docs/latest/charts/line.html#line-styling
-               -- 'spanGaps', true,
-               -- 'showLine', true,
+               -- data set style
+               'borderWidth', 2, -- line size
+               'borderColor', sensors.color, -- line color
+               'backgroundColor', sensors.color, -- point/legend fill
+               'pointRadius', 1, -- reduce point size
+               'tension', 0.4, -- cubic interpolation
+               -- 'spanGaps', 3, -- span gaps (not working)
 
                -- data set measurements
                'data', (
