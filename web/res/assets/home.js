@@ -241,20 +241,40 @@
       />
 
       <dl class='row'>
-        <dt class='col-sm-3'>Time</dt>
-        <dd class='col-sm-9'>${h(row.start)} - ${h(row.end)}</dd>
+        <dt class='col-sm-3' title='Time' aria-label='Time'>
+          Time
+        </dt>
+        <dd class='col-sm-9' title='Time' aria-label='Time'>
+          ${h(row.start)} - ${h(row.end)}
+        </dd>
 
-        <dt class='col-sm-3'>Temperature</dt>
-        <dd class='col-sm-9'>${row.temperature}&deg;F</dd>
+        <dt class='col-sm-3' title='Temperature' aria-label='Temperature'>
+          Temperature
+        </dt>
+        <dd class='col-sm-9' title='Temperature' aria-label='Temperature'>
+          ${row.temperature}&deg;F
+        </dd>
 
-        <dt class='col-sm-3'>Precipitation</dt>
-        <dd class='col-sm-9'>${row.probabilityOfPrecipitation.value ?? '0'}%</dd>
+        <dt class='col-sm-3' title='Precipitation' aria-label='Precipitation'>
+          Precipitation
+        </dt>
+        <dd class='col-sm-9' title='Precipitation' aria-label='Precipitation'>
+          ${row.probabilityOfPrecipitation.value ?? '0'}%
+        </dd>
 
-        <dt class='col-sm-3'>Wind</dt>
-        <dd class='col-sm-9'>${row.windSpeed} ${row.windDirection}</dd>
+        <dt class='col-sm-3' title='Wind' aria-label='Wind'>
+          Wind
+        </dt>
+        <dd class='col-sm-9' title='Wind' aria-label='Wind'>
+          ${row.windSpeed} ${row.windDirection}
+        </dd>
 
-        <dt class='col-sm-3'>Forecast</dt>
-        <dd class='col-sm-9'>${h(row.detailedForecast)}</dd>
+        <dt class='col-sm-3' title='Forecast' aria-label='Forecast'>
+          Forecast
+        </dt>
+        <dd class='col-sm-9' title='Forecast' aria-label='Forecast'>
+          ${h(row.detailedForecast)}
+        </dd>
       </dl>
     `,
   };
@@ -321,7 +341,7 @@
     document.getElementById('edit-sort').value = data.sort;
   });
 
-  // bind to save button click events
+  // bind to edit dialog save button click events
   document.getElementById('edit-save-btn').addEventListener('click', (ev) => {
     fetch('/api/home/current/edit', {
       method: 'POST',
