@@ -144,6 +144,70 @@
               <b>Charts</b>
             </div>
 
+            <div class='card-header'>
+              <div class='btn-toolbar justify-content-center'>
+                <div class='btn-group' role='group'>
+                  <input
+                    type='radio'
+                    id='time-6'
+                    class='time btn-check'
+                    name='time'
+                    value='6'
+                    autocomplete='off'
+                    title='Show measurements from last 6 hours.'
+                    aria-label='Show measurements from last 6 hours.'
+                  />
+                  <label
+                    for='time-6'
+                    class='time btn btn-sm btn-outline-primary'
+                    title='Show measurements from last 6 hours.'
+                    aria-label='Show measurements from last 6 hours.'
+                  >
+                    6 Hours
+                  </label>
+
+                  <input
+                    type='radio'
+                    id='time-12'
+                    class='time btn-check'
+                    name='time'
+                    value='12'
+                    autocomplete='off'
+                    title='Show measurements from last 12 hours.'
+                    aria-label='Show measurements from last 12 hours.'
+                    checked
+                  />
+                  <label
+                    for='time-12'
+                    class='time btn btn-sm btn-outline-primary'
+                    title='Show measurements from last 12 hours.'
+                    aria-label='Show measurements from last 12 hours.'
+                  >
+                    12 Hours
+                  </label>
+
+                  <input
+                    type='radio'
+                    id='time-24'
+                    class='time btn-check'
+                    name='time'
+                    value='24'
+                    autocomplete='off'
+                    title='Show measurements from last 24 hours.'
+                    aria-label='Show measurements from last 24 hours.'
+                  />
+                  <label
+                    for='time-24'
+                    class='time btn btn-sm btn-outline-primary'
+                    title='Show measurements from last 24 hours.'
+                    aria-label='Show measurements from last 24 hours.'
+                  >
+                    24 Hours
+                  </label>
+                </div><!-- btn-group -->
+              </div><!-- btn-toolbar -->
+            </div><!-- card-header -->
+
             <div class='card-body'>
               <div class='chart-wrapper'>
                 <canvas id='chart-t'></canvas>
