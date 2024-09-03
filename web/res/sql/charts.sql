@@ -1,9 +1,18 @@
+--
+-- charts view: view with a single row containing a `data` column.  The
+-- `data` column is a JSON-encoded map of chart type to chart data.
+--
+-- * chart type: one of 't' or 'h', indicating temperature or humidity,
+--   respectively.
+-- * chart data: data needed to generate a line chart using chartjs
+--   where the X axis is time and the Y axis is the measurement value.
+--
 BEGIN;
 DROP VIEW IF EXISTS charts;
 CREATE VIEW charts(data) AS
-  -- normally we would use generate_series(), but the modernc.org/sqlite
-  -- driver does not implement the "series" extension.  instead, we're
-  -- using a modified version of the recursive CTE suggested here:
+  -- modernc.org does not implement the "series" extension so we cannot
+  -- use generate_series().  instead, we're a modified version of the
+  -- recursive CTE suggested here:
   --
   --   https://www.sqlite.org/series.html
   --
@@ -20,19 +29,6 @@ CREATE VIEW charts(data) AS
       FROM times
         -- next value (increment by 15 minutes)
      WHERE ts + (15*60) <= (unixepoch() - unixepoch() % (15*60))
-  -- ), times AS (
-  --   SELECT value AS ts,
-  --          datetime(value, 'unixepoch', 'localtime') AS s
-  --     FROM generate_series(
-  --       -- start time (24 hours ago)
-  --       unixepoch() - unixepoch() % (15*60) - 24*60*60,
-
-  --       -- end time (most recent 15 minute tick)
-  --       unixepoch() - unixepoch() % (15*60),
-
-  --       -- time series increment (15 minutes)
-  --       15*60
-  --     )
   ), types AS (
     -- chart types
     SELECT column1 AS id, -- chart id ("t" or "h")
