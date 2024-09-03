@@ -306,6 +306,25 @@ func doApiHomeForecastDownload(w http.ResponseWriter, r *http.Request) {
 //   return mockCharts, nil
 // }
 
+// /api/home/charts/poll handler
+func doApiHomeChartsPoll(w http.ResponseWriter, r *http.Request) {
+  // get JSON-encoded chart data
+  s, err := dbChartData(db)
+  if err != nil {
+    log.Print(err) // log error
+    http.Error(w, "error", 500)
+    return
+  }
+
+  // send JSON-encoded charts
+  w.Header().Add("content-type", "application/json")
+  if _, err := w.Write([]byte(s)); err != nil {
+    log.Print(err) // log error
+    http.Error(w, "error", 500)
+    return
+  }
+}
+
 // return handler which sends named HTML file.
 func doHtmlFile(name string) func(http.ResponseWriter, *http.Request) {
   // build full path
@@ -468,6 +487,7 @@ func main() {
   r.Get("/api/home/current/download", doApiHomeCurrentDownload)
   r.Post("/api/home/forecast/poll", doApiHomeForecastPoll)
   r.Get("/api/home/forecast/download", doApiHomeForecastDownload)
+  r.Post("/api/home/charts/poll", doApiHomeChartsPoll)
   r.Get("/", doHtmlFile("home.html"))
   r.Get("/about/", doHtmlFile("about.html"))
   r.Get("/forecasts/", doHtmlFile("forecasts.html"))
