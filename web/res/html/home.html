@@ -311,5 +311,168 @@
         </div><!-- modal-content -->
       </div><!-- modal-dialog -->
     </div><!-- modal -->
+
+    <div
+      id='edit-dialog'
+      class='modal fade'
+      tabindex='-1'
+      aria-labelledby='edit-dialog-title'
+      aria-hidden='true'
+    >
+      <div class='modal-dialog'>
+        <div class='modal-content'>
+          <div class='modal-header'>
+            <h1 id='edit-dialog-title' class='modal-title fs-5'>Edit Sensor</h1>
+            <button
+              type='button'
+              class='btn-close'
+              data-bs-dismiss='modal'
+              aria-label='Close'
+              title='Close dialog.'
+              aria-label='Close dialog.'
+            ></button>
+          </div><!-- modal-header -->
+
+          <div class='modal-body'>
+            <div class='mb-3 row'>
+              <label
+                for='edit-id'
+                class='col-sm-2 col-form-label'
+                title='Sensor unique identifier'
+                aria-label='Sensor unique identifier'
+                aria-describedby='edit-id-help'
+              >
+                ID
+              </label>
+
+              <div class='col-sm-10'>
+                <input
+                  type='text'
+                  id='edit-id'
+                  class='form-control-plaintext'
+                  value='asdffdsa'
+                  title='Sensor unique identifier'
+                  aria-label='Sensor unique identifier'
+                  aria-describedby='edit-id-help'
+                  readonly
+                />
+
+                <div id='edit-id-help' class='form-text'>
+                  Read-only unique identifier.
+                </div><!-- form-text -->
+              </div><!-- col -->
+            </div><!-- row -->
+
+            <div class='mb-3 row'>
+              <label
+                for='edit-name'
+                class='col-sm-2 col-form-label'
+                title='Sensor name'
+                aria-label='Sensor name'
+                aria-describedby='edit-name-help'
+              >
+                Name
+              </label>
+
+              <div class='col-sm-10'>
+                <input
+                  type='text'
+                  id='edit-name'
+                  class='form-control'
+                  title='Sensor name'
+                  aria-label='Sensor name'
+                  aria-describedby='edit-name-help'
+                />
+
+                <div id='edit-name-help' class='form-text'>
+                  Display name.
+                </div><!-- form-text -->
+              </div><!-- col -->
+            </div><!-- row -->
+
+            <div class='mb-3 row'>
+              <label
+                for='edit-color'
+                class='col-sm-2 col-form-label'
+                title='Line color'
+                aria-label='Line color'
+                aria-describedby='edit-color-help'
+              >
+                Color
+              </label>
+
+              <div class='col-sm-10'>
+                <input
+                  type='color'
+                  id='edit-color'
+                  class='form-control form-control-color'
+                  title='Line color'
+                  aria-label='Line color'
+                  aria-describedby='edit-color-help'
+                />
+
+                <div id='edit-color-help' class='form-text'>
+                  Sensor chart line and point color.
+                </div><!-- form-text -->
+              </div><!-- col -->
+            </div><!-- row -->
+
+            <div class='mb-3 row'>
+              <label
+                for='edit-sort'
+                class='col-sm-2 col-form-label'
+                title='Sort order'
+                aria-label='Sort order'
+                aria-describedby='edit-sort-help'
+              >
+                Sort
+              </label>
+
+              <div class='col-sm-10'>
+                <input
+                  type='number'
+                  id='edit-sort'
+                  class='form-control'
+                  title='Sort order'
+                  aria-label='Sort order'
+                  aria-describedby='edit-sort-help'
+                  placeholder='0'
+                  min='0'
+                  max='20'
+                  step='1'
+                />
+
+                <div id='edit-sort-help' class='form-text'>
+                  Numeric sort order.  Sensors are grouped by this value
+                  and sorted from low to high.  Sensors in the same
+                  group are sorted alphabetically.
+                </div><!-- form-text -->
+              </div><!-- col -->
+            </div><!-- row -->
+          </div><!-- modal-body -->
+
+          <div class='modal-footer'>
+            <button
+              type='button'
+              class='btn btn-primary'
+              title='Save changes.'
+              aria-label='Save changes.'
+            >
+              Save Changes
+            </button>
+
+            <button
+              type='button'
+              class='btn btn-secondary'
+              data-bs-dismiss='modal'
+              title='Close dialog.'
+              aria-label='Close dialog.'
+            >
+              Close
+            </button>
+          </div><!-- modal-footer -->
+        </div><!-- modal-content -->
+      </div><!-- modal-dialog -->
+    </div><!-- modal -->
   </body>
 </html>
