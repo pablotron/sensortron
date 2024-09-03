@@ -295,7 +295,8 @@
               type='button'
               class='btn-close'
               data-bs-dismiss='modal'
-              aria-label='Close'
+              title='Close dialog'
+              aria-label='Close dialog'
             ></button>
           </div><!-- modal-header -->
 
@@ -304,7 +305,13 @@
           </div><!-- modal-body -->
 
           <div class='modal-footer'>
-            <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>
+            <button
+              type='button'
+              class='btn btn-secondary'
+              data-bs-dismiss='modal'
+              title='Close dialog'
+              aria-label='Close dialog'
+            >
               Close
             </button>
           </div><!-- modal-footer -->
@@ -379,6 +386,7 @@
                   type='text'
                   id='edit-name'
                   class='form-control'
+                  placeholder='sensor name'
                   title='Sensor name'
                   aria-label='Sensor name'
                   aria-describedby='edit-name-help'
