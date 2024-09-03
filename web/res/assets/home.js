@@ -306,30 +306,46 @@
     }
   });
 
-  // bind click events
+  // bind to unit button click events
   document.querySelectorAll('input.unit, label.unit').forEach((e) => {
     e.addEventListener('click', () => { setTimeout(poll_current, 10) })
   });
 
-  // bind to current entry click events
-  current_el.addEventListener('click', (ev) => {
-    if (ev.target.tagName === 'A') {
-      const data = ev.target.dataset;
+  // populate edit dialog when shown
+  document.getElementById('edit-dialog').addEventListener('show.bs.modal', (ev) => {
+    const data = ev.relatedTarget.dataset;
 
-      console.log(ev);
-      ev.preventDefault();
-      const name = prompt('Enter new name for sensor "' + data.name + '":', data.name);
-      if (name !== null) {
-        fetch('/api/home/current/edit', {
-          method: 'POST',
-          body: JSON.stringify({
-            id: data.id,
-            name: name,
-          }),
-        }).then((r) => poll_current());
+    document.getElementById('edit-id').value = data.id;
+    document.getElementById('edit-name').value = data.name;
+    document.getElementById('edit-color').value = data.color;
+    document.getElementById('edit-sort').value = data.sort;
+  });
+
+  // bind to save button click events
+  document.getElementById('edit-save-btn').addEventListener('click', (ev) => {
+    fetch('/api/home/current/edit', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: document.getElementById('edit-id').value,
+        name: document.getElementById('edit-name').value,
+        color: document.getElementById('edit-color').value,
+        sort: document.getElementById('edit-sort').value,
+      }),
+    }).then((r) => {
+      if (!r.ok) {
+        alert("Couldn't save changes");
+        return;
       }
-    }
-  }, true);
+
+      // refresh current and charts
+      poll_current();
+      poll_charts();
+
+      // dismiss dialog
+      const close_btn_css = '#edit-dialog .modal-footer button[data-bs-dismiss]';
+      document.querySelector(close_btn_css).click();
+    });
+  });
 
   // populate period dialog when shown
   document.getElementById('period-dialog').addEventListener('show.bs.modal', (ev) => {
