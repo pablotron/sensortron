@@ -177,7 +177,7 @@ func timestampSuffix() string {
 // /api/home/current/download handler
 func doApiHomeCurrentDownload(w http.ResponseWriter, r *http.Request) {
   // build content-disposition header value
-  disposition := fmt.Sprintf("attachment; filename=\"sensortron-current-data-%s.csv\"", timestampSuffix())
+  disposition := fmt.Sprintf("attachment; filename=\"sensortron-current-%s.csv\"", timestampSuffix())
 
   // get poll rows
   pollRows, err := getPollRows()
