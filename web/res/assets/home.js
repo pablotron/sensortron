@@ -79,6 +79,57 @@
         },
       },
     },
+  }, {
+    id: 'h',
+    options: {
+      maintainAspectRatio: false,
+
+      scales: {
+        y: {
+          title: {
+            display: true,
+            text: 'Humidity (%)',
+          },
+
+          grid: { display: false },
+        },
+
+        x: {
+          type: 'time',
+
+          title: {
+            display: true,
+            text: 'Time',
+          },
+
+          ticks: {
+            // limit maximum number of ticks
+            maxTicksLimit: 8,
+          },
+
+          grid: { display: false },
+          time: {
+            minUnit: 'hour',
+
+            // ref: https://date-fns.org/v3.6.0/docs/format
+            tooltipFormat: 'MM/dd HH:mm',
+          },
+        },
+      },
+
+      plugins: {
+        title: {
+          display: true,
+          text: 'Humidity',
+          font: { weight: 'bold', size: 18 },
+        },
+
+        tooltip: {
+          mode: 'nearest',
+          intersect: false,
+        },
+      },
+    },
   }];
 
   // templates
