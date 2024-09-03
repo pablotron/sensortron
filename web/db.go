@@ -130,3 +130,57 @@ func dbChartData(db *db_sql.DB) (string, error) {
   err := db.QueryRow(chartDataSql).Scan(&s)
   return s, err
 }
+
+var sensorsSql = `
+  SELECT id,
+         name,
+         color,
+         sort
+    FROM sensors
+   ORDER BY sort, LOWER(name)
+`
+
+// Get ordered list of sensors from sensors table.
+func dbSensors(db *db_sql.DB) ([]Sensor, error) {
+  r := make([]Sensor, 0)
+
+  // exec query, get result
+  rows, err := db.Query(sensorsSql)
+  if err != nil {
+    return r, err
+  }
+  defer rows.Close()
+
+  // build result
+  for rows.Next() {
+    // get sensor properties
+    var s Sensor
+    if err := rows.Scan(&s.Id, &s.Name, &s.Color, &s.Sort); err != nil {
+      return r, err
+    }
+
+    // append sensor to results
+    r = append(r, s)
+  }
+
+  // check for error
+  if err := rows.Err(); err != nil {
+    return r, err
+  }
+
+  // return result
+  return r, nil
+}
+
+var sensorUpdateSql = `
+  UPDATE sensors
+     SET name = ?, color = ?, sort = ?
+   WHERE id = ?
+`
+
+// Update sensor in sensors table.
+func dbSensorUpdate(db *db_sql.DB, s Sensor) error {
+  // update row
+  _, err := db.Exec(sensorUpdateSql, s.Name, s.Color, s.Sort, s.Id)
+  return err
+}
