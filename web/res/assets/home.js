@@ -74,7 +74,7 @@
         },
 
         tooltip: {
-          mode: 'nearest',
+          mode: 'index',
           intersect: false,
         },
       },
@@ -125,7 +125,7 @@
         },
 
         tooltip: {
-          mode: 'nearest',
+          mode: 'index',
           intersect: false,
         },
       },
