@@ -1,18 +1,21 @@
+/* default */
 div.chart-wrapper {
   position: relative;
   height: 40vh;
 }
 
-@media (orientation: landscape) {
-  div.chart-wrapper {
-    position: relative;
-    height: 100vh;
-  }
-}
-
-@media (orientation: portrait) {
+/* desktops, portrait phones */
+@media (min-width: 768px) {
   div.chart-wrapper {
     position: relative;
     height: 40vh;
+  }
+}
+
+/* horizontal phones */
+@media (max-height: 767.98px) {
+  div.chart-wrapper {
+    position: relative;
+    height: 100vh;
   }
 }
