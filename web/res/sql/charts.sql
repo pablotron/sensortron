@@ -86,7 +86,7 @@ CREATE VIEW charts(data) AS
                )
              ))
 
-        FROM sensors 
+        FROM sensors
 
        -- sort sensors by sort column, then by name (case-insensitive)
        ORDER BY sensors.sort,
