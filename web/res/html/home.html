@@ -17,6 +17,7 @@
     <script type='text/javascript' src='/assets/home/charts.js' defer></script>
     <script type='text/javascript' src='/assets/home/edit.js' defer></script>
     <script type='text/javascript' src='/assets/home/period.js' defer></script>
+    <script type='text/javascript' src='/assets/home/help.js' defer></script>
   </head>
 
   <body>
@@ -80,9 +81,52 @@
       <div class='row'>
         <div class='col-md-8'>
           <div class='card mb-4'>
-            <div class='card-header'>
-              <b>Current Data</b>
-            </div>
+            <div class='card-header d-flex justify-content-between'>
+              <b class='pt-1'>
+                Current Data
+              </b>
+
+              <button
+                type='button'
+                class='btn btn-sm btn-outline-secondary'
+                aria-label='Show help.'
+                data-bs-toggle='popover'
+                data-bs-placement='bottom'
+                data-bs-trigger='focus'
+                data-bs-title='Current Data Help'
+                data-bs-html='true'
+                data-bs-content='
+                  <p>
+                    This panel shows the latest temperature and
+                    humidity measurements from all sensors.
+                  </p>
+
+                  <p>
+                    Click the sensor name to edit the name, chart
+                    color, and sort order of the sensor.
+                  </p>
+
+                  <p>
+                    Click <b>Download</b> button in the panel footer
+                    to download the current sensor measurements as a
+                    CSV file.
+                  </p>
+
+                  <p>
+                    Use the <b>Celcius</b> and <b>Fahrenheit</b> radio
+                    buttons in the panel footer to set the temperature
+                    unit.
+                  </p>
+
+                  <p>
+                    Note: The sensor measurements in this panel will
+                    automatically refresh every 10 seconds.
+                  </p>
+                '
+              >
+                Help
+              </button>
+            </div><!-- card-header -->
 
             <table id='current' class='table table-hover'>
             </table>
@@ -145,9 +189,51 @@
           </div><!-- card -->
 
           <div class='card mb-4'>
-            <div class='card-header'>
-              <b>Charts</b>
-            </div>
+            <div class='card-header d-flex justify-content-between'>
+              <b class='pt-1'>
+                Charts
+              </b>
+
+              <button
+                type='button'
+                class='btn btn-sm btn-outline-secondary'
+                aria-label='Show help.'
+                data-bs-toggle='popover'
+                data-bs-placement='bottom'
+                data-bs-trigger='focus'
+                data-bs-title='Charts Help'
+                data-bs-html='true'
+                data-bs-content='
+                  <p>
+                    This panel shows charts of temperature and humidity
+                    measurements for the last several hours.
+                  </p>
+
+                  <p>
+                    Click the buttons in the panel header to set the
+                    time interval shown on each chart.
+                  </p>
+
+                  <p>
+                    Click the sensor names in the chart legend to show
+                    or hide the sensor measurements.
+                  </p>
+
+                  <p>
+                    Click the <b>Download</b> button in the panel
+                    footer to download one of the charts as a PNG
+                    image.
+                  </p>
+
+                  <p>
+                    Note: The charts in this panel will automatically
+                    refresh every 5 minutes.
+                  </p>
+                '
+              >
+                Help
+              </button>
+            </div><!-- card-header -->
 
             <div class='card-header'>
               <div class='btn-toolbar justify-content-center'>
@@ -292,9 +378,45 @@
 
         <div class='col-md-4'>
           <div class='card mb-4'>
-            <div class='card-header'>
-              <b>Forecast</b>
-            </div>
+            <div class='card-header d-flex justify-content-between'>
+              <b class='pt-1'>
+                Forecast
+              </b>
+
+              <button
+                type='button'
+                class='btn btn-sm btn-outline-secondary'
+                aria-label='Show help.'
+                data-bs-toggle='popover'
+                data-bs-placement='bottom'
+                data-bs-trigger='focus'
+                data-bs-title='Forecast Help'
+                data-bs-html='true'
+                data-bs-content='
+                  <p>
+                    This panel shows a summary of the current weather
+                    forecast.
+                  </p>
+
+                  <p>
+                    Click a forecast period to see a more detailed
+                    summary.
+                  </p>
+
+                  <p>
+                    Click <b>Download</b> button in the panel footer
+                    to download the forecast as a  CSV file.
+                  </p>
+
+                  <p>
+                    Note: The forecast in this panel will automatically
+                    refresh every 4 hours.
+                  </p>
+                '
+              >
+                Help
+              </button>
+            </div><!-- card-header -->
 
             <ul id='forecast' class='list-group'>
             </ul>
