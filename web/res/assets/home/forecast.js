@@ -3,7 +3,7 @@
 
   // templates
   const T = {
-    forecast_row: (row) => `
+    row: (row) => `
       <li
         class='list-group-item'
         title='${h(row.name)}: ${h(row.detailedForecast)}'
@@ -28,19 +28,19 @@
     `,
   };
 
-  // cache current data wrapper and forecast wrapper
+  // cache forecast wrapper
   const forecast_el = document.getElementById('forecast');
 
   // poll for current forecast
-  const poll_forecast = () => fetch('/api/home/forecast/poll', { method: 'POST' }).then(
+  const poll = () => fetch('/api/home/forecast/poll', { method: 'POST' }).then(
     (r) => r.json()
   ).then((r) => {
     forecast_el.dataset.forecast = JSON.stringify(r);
     const rows = r.properties.periods.slice(0, 8);
-    forecast_el.innerHTML = rows.map((row) => T.forecast_row(row)).join('');
+    forecast_el.innerHTML = rows.map((row) => T.row(row)).join('');
   });
 
-  // poll for current forecast
-  setInterval(poll_forecast, 30 * 60000); // 30m
-  poll_forecast();
+  // start polling
+  setInterval(poll, 30 * 60000); // 30m
+  poll();
 })();
