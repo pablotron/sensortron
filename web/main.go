@@ -99,6 +99,7 @@ func doApiRead(w http.ResponseWriter, r *http.Request) {
   }
 }
 
+// Current sensor data.
 type PollRow struct {
   Sensor Sensor `json:"sensor"` // sensor properties
   Data SensorData `json:"data"` // sensor data
@@ -283,45 +284,6 @@ func doApiHomeForecastDownload(w http.ResponseWriter, r *http.Request) {
   }
 }
 
-// // chart data set
-// type ChartDataset struct {
-//   Label string `json:"label"` // label (shown in legend)
-//   Data []float32 `json:"data"` // data points
-//   BorderWidth int `json:"borderWidth"` // border width
-//   BorderColor string `json:"borderColor"` // border color
-//   // BackgroundColor string `json:"backgroundColor"` // background color
-// }
-//
-// type Chart struct {
-//   Labels []string `json:"labels"` // X axis labels
-//   Datasets []ChartDataset `json:"datasets"` // data sets
-// }
-//
-// var mockCharts = map[string]Chart {
-//   "t": Chart {
-//     Labels: []string { "Red", "Blue", "Yellow", "Green", "Purple", "Orange" },
-//     Datasets: []ChartDataset {
-//       ChartDataset {
-//         Label: "# of Votes",
-//         Data: []float32 { 12, 19, 3, 5, 2, 3 },
-//         BorderWidth: 1,
-//         BorderColor: "#ffaa00",
-//       },
-//       ChartDataset {
-//         Label: "# of Votes",
-//         Data: []float32 { 3, 5, 2, 3, 12, 19 },
-//         BorderWidth: 1,
-//         BorderColor: "#00aaff",
-//       },
-//     },
-//   },
-// }
-//
-// // Get charts (TODO: use for doApiHomeChartsPoll())
-// func getCharts() (map[string]Chart, error) {
-//   return mockCharts, nil
-// }
-
 // /api/home/charts/poll handler
 func doApiHomeChartsPoll(w http.ResponseWriter, r *http.Request) {
   // get JSON-encoded chart data
@@ -418,38 +380,26 @@ func main() {
   go func() {
     ctx := context.Background()
 
-    // parse sleep duration
-    delay, err := time.ParseDuration("10m")
-    if err != nil {
-      panic(err)
-    }
-
     // loop forever
     for {
       // get latest observations as sensordata
       if data, err := fetchLatestObservations(ctx, config.StationId); err != nil {
         log.Print(err)
       } else {
-        // log.Printf("DEBUG: NWS data = %#v", data)
+        // set latest outside observations
         if err := setLatest("outside", data); err != nil {
           panic(err)
         }
       }
 
-      // sleep until next fetch interval
-      time.Sleep(delay)
+      // sleep until next fetch interval (10 minutes)
+      time.Sleep(10 * time.Minute)
     }
   }()
 
   // fetch current forecast every 4 hours
   go func() {
     ctx := context.Background()
-
-    // parse sleep duration
-    delay, err := time.ParseDuration("4h")
-    if err != nil {
-      panic(err)
-    }
 
     // loop forever
     for {
@@ -460,11 +410,11 @@ func main() {
       } else {
         // update cached forecast
         cachedForecast = body
-        log.Printf("NWS forecast = %s", string(body))
+        log.Printf("NWS forecast updated (%d bytes)", len(body))
       }
 
-      // sleep until next fetch interval
-      time.Sleep(delay)
+      // sleep until next fetch interval (4 hours)
+      time.Sleep(4 * time.Hour)
     }
   }()
 
