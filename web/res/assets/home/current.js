@@ -20,7 +20,7 @@
 
   // templates
   const T = {
-    current_table: (unit, rows) => `
+    table: (unit, rows) => `
       <thead>
         <tr>
           <th
@@ -51,7 +51,7 @@
       <tbody>${rows}</tbody>
     `,
 
-    current_row: (unit, {sensor, data}) => `
+    row: (unit, {sensor, data}) => `
       <tr id='${h(sensor.id)}'>
         <td
           title='Sensor name.'
@@ -85,8 +85,8 @@
 
         <td
           style='text-align: right'
-          title='Humidity in ${h(sensor.name)}.'
-          aria-label='Humidity in ${h(sensor.name)}.'
+          title='${h(sensor.name)} humidity (%).'
+          aria-label='${h(sensor.name)} (%).'
         >
           ${(data.h * 100).toFixed(1)}%
         </td>
@@ -94,27 +94,24 @@
     `,
   };
 
-  // cache current wrapper
-  const current_el = document.getElementById('current');
-
   // poll for current sensor measurements
-  const poll_current = () => fetch('/api/home/current/poll', { method: 'POST' }).then(
+  const poll = () => fetch('/api/home/current/poll', { method: 'POST' }).then(
     (r) => r.json()
   ).then((r) => {
     const unit = UNITS[document.querySelector('input.unit[type="radio"]:checked').value],
-          rows = r.map((row) => T.current_row(unit, row)).join('');
-    current_el.innerHTML = T.current_table(unit, rows);
+          rows = r.map((row) => T.row(unit, row)).join('');
+    document.getElementById('current').innerHTML = T.table(unit, rows);
   });
 
   // bind to unit button click events
   document.querySelectorAll('input.unit, label.unit').forEach((e) => {
-    e.addEventListener('click', () => { setTimeout(poll_current, 10) })
+    e.addEventListener('click', () => { setTimeout(poll, 10) })
   });
 
   // bind to saved event
-  document.getElementById('edit-dialog').addEventListener('saved', poll_current);
+  document.getElementById('edit-dialog').addEventListener('saved', poll);
 
   // poll for current sensor measurements
-  setInterval(poll_current, 10000); // 10s
-  poll_current();
+  setInterval(poll, 10000); // 10s
+  poll();
 })();
