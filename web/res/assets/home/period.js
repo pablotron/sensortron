@@ -3,7 +3,7 @@
 
   // templates
   const T = {
-    period_dialog_body: (row) => `
+    body: (row) => `
       <img
         src='${h(row.icon)}'
         class='rounded float-start me-2'
@@ -13,10 +13,18 @@
       />
 
       <dl class='row'>
-        <dt class='col-sm-3' title='Time' aria-label='Time'>
+        <dt
+          class='col-sm-3'
+          title='Forecast time period'
+          aria-label='Forecast time period'
+        >
           Time
         </dt>
-        <dd class='col-sm-9' title='Time' aria-label='Time'>
+        <dd
+          class='col-sm-9'
+          title='Forecast time period'
+          aria-label='Forecast time period'
+        >
           ${h(row.start)} - ${h(row.end)}
         </dd>
 
@@ -27,17 +35,33 @@
           ${row.temperature}&deg;F
         </dd>
 
-        <dt class='col-sm-3' title='Precipitation' aria-label='Precipitation'>
+        <dt
+          class='col-sm-3'
+          title='Probability of precipitation'
+          aria-label='Probability of precipitation'
+        >
           Precipitation
         </dt>
-        <dd class='col-sm-9' title='Precipitation' aria-label='Precipitation'>
+        <dd
+          class='col-sm-9'
+          title='Probability of precipitation'
+          aria-label='Probability of precipitation'
+        >
           ${row.probabilityOfPrecipitation.value ?? '0'}%
         </dd>
 
-        <dt class='col-sm-3' title='Wind' aria-label='Wind'>
+        <dt
+          class='col-sm-3'
+          title='Wind speed and direction'
+          aria-label='Wind speed and direction'
+        >
           Wind
         </dt>
-        <dd class='col-sm-9' title='Wind' aria-label='Wind'>
+        <dd
+          class='col-sm-9'
+          title='Wind speed and direction'
+          aria-label='Wind speed and direction'
+        >
           ${row.windSpeed} ${row.windDirection}
         </dd>
 
@@ -58,8 +82,8 @@
     row.start = (new Date(row.startTime)).toLocaleString();
     row.end = (new Date(row.endTime)).toLocaleString();
 
-    // render modal title and body
+    // set modal title and body
     document.getElementById('period-dialog-title').textContent = row.name;
-    document.getElementById('period-dialog-body').innerHTML = T.period_dialog_body(row);
+    document.getElementById('period-dialog-body').innerHTML = T.body(row);
   });
 })();
