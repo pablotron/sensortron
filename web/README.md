@@ -37,3 +37,25 @@ Use `podman run` to run the image.  Example:
 Other commands:
 - `podman stop sensortron`: stop the container
 - `podman logs -f sensortron`: monitor container logs
+
+## Environment Variables
+
+Configuration environment variables:
+
+- `SENSORTRON_DB_PATH`: Database path.  Defaults to `/data/sensortron.db`.
+- `SENSORTRON_STATION_ID`: Weather station ID.  Defaults to `KDCA`.
+- `SENSORTRON_FORECAST_WFO`: Weather Forecasting Office.  Defaults to `LWX`
+- `SENSORTRON_FORECAST_GRID_X`: WFO grid X coordinate.  Defaults to `91`.
+- `SENSORTRON_FORECAST_GRID_Y`: WFO grid Y coordinate.  Defaults to `70`.
+- `TZ`: Time zone.  Set to `America/New_York` in included `Dockerfile`.
+
+## Building Assets
+
+The CSS and JS assets are vendored in the `res/assets/` directory, so
+the steps in this section are not necessary unless you are making
+development changes to sensortron.
+
+1. Run `npm install` to install the CSS and JS dependencies in
+   the `node_modules/` directory.
+2. Run `./install-assets.sh` to copy the relevant CSS and JS files to
+   their appropriate destinations in `res/assets/`.
