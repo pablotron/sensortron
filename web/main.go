@@ -352,13 +352,25 @@ func fetchLatestObservations(ctx context.Context, stationId string) (SensorData,
     return SensorData{}, err
   }
 
+  // build return value
+  r := SensorData { E: observations.Properties.Timestamp }
+  if observations.Properties.Temperature.Value != nil {
+    // set temperature
+    r.T = *observations.Properties.Temperature.Value
+  }
+
+  if observations.Properties.RelativeHumidity.Value != nil {
+    // set humidity
+    r.H = *observations.Properties.RelativeHumidity.Value / 100.0
+  }
+
+  if observations.Properties.BarometricPressure.Value != nil {
+    // set barometric pressure
+    r.P = *observations.Properties.BarometricPressure.Value
+  }
+
   // build and return sensor data
-  return SensorData {
-    T: *observations.Properties.Temperature.Value,
-    H: *observations.Properties.RelativeHumidity.Value / 100.0,
-    P: *observations.Properties.BarometricPressure.Value,
-    E: observations.Properties.Timestamp,
-  }, nil
+  return r, nil
 }
 
 func main() {
